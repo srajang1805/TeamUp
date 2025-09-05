@@ -1,1 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Groups - Team Up</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at top left, #0d0d2b, #000000 70%);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(0, 255, 255, 0.6);
+      animation: float 10s infinite linear;
+    }
+
+    @keyframes float {
+      from { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      to { transform: translateY(-10vh) scale(1.2); opacity: 1; }
+    }
+
+    header {
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 2px 10px rgba(0,255,255,0.2);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+      position: relative;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #00f0ff;
+      text-shadow: 0 0 12px #00f0ff;
+    }
+
+    nav { display: flex; gap: 0.6rem; }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav a:hover { background: #00f0ff; color: #000; }
+
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    h2 { color: #00f0ff; margin-bottom: 1rem; text-align: center; }
+
+    .card {
+      background: rgba(20, 20, 50, 0.75);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      box-shadow: 0 0 6px rgba(0, 240, 255, 0.2), 0 0 12px rgba(255, 0, 247, 0.2);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 0 14px rgba(0, 240, 255, 0.6), 0 0 18px rgba(255, 0, 247, 0.6); }
+
+    .btn {
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-top: 0.3rem;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .btn-chat { background: #00f0ff; color: #000; }
+    .btn-chat:hover { transform: translateY(-2px); background: #00c0ff; }
+    .btn-exit { background: #ff5252; color: #fff; }
+    .btn-exit:hover { background: #e53935; transform: translateY(-2px); }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: #aaa;
+      z-index: 2;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="particles"></div>
+
+  <header>
+    <h1>My Groups</h1>
+    <nav>
+      <a href="dashboard.html">Home</a>
+      <a href="invite.html">Invites</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+  </header>
+
+  <div class="container" id="groupsContainer">
+    <h2>Your Groups</h2>
+  </div>
+
+  <footer>© 2025 Team Up</footer>
+
+  <!-- Particles -->
+  <script>
+    const particlesContainer = document.querySelector('.particles');
+    for (let i = 0; i < 40; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      particle.style.left = Math.random() * 100 + "vw";
+      particle.style.animationDuration = (6 + Math.random() * 6) + "s";
+      const size = 3 + Math.random() * 5;
+      particle.style.width = size + "px";
+      particle.style.height = size + "px";
+      particlesContainer.appendChild(particle);
+    }
+  </script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs, getDoc, doc, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
+      authDomain: "teamup-8a9f0.firebaseapp.com",
+      projectId: "teamup-8a9f0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const container = document.getElementById("groupsContainer");
+    let currentUser = null;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = "login.html";
+      currentUser = user;
+      loadGroups();
+    });
+
+    async function loadGroups() {
+      container.innerHTML = "";
+      const q = query(collection(db, "groups"), where("members", "array-contains", currentUser.uid));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        container.innerHTML = "<p style='text-align:center;color:#ccc;'>You are not part of any groups yet.</p>";
+        return;
+      }
+
+      for (const docSnap of snap.docs) {
+        const group = docSnap.data();
+
+        // Fetch member names
+        const memberNames = [];
+        for (const uid of group.members) {
+          const userSnap = await getDoc(doc(db, "users", uid));
+          if (userSnap.exists()) {
+            memberNames.push(userSnap.data().name);
+          }
+        }
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div>
+            <strong>${group.name}</strong><br>
+            Members: ${memberNames.join(", ")}
+          </div>
+          <div>
+            <button class="btn btn-chat" onclick="openGroup('${docSnap.id}')">Open Chat</button>
+            <button class="btn btn-exit" onclick="exitGroup('${docSnap.id}')">Exit Group</button>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+    }
+
+    window.openGroup = (groupId) => {
+      window.location.href = `chat.html?groupId=${groupId}`;
+    };
+
+    window.exitGroup = async (groupId) => {
+      const confirmExit = confirm("Are you sure you want to exit this group?");
+      if (!confirmExit) return;
+
+      await updateDoc(doc(db, "groups", groupId), {
+        members: arrayRemove(currentUser.uid)
+      });
+      alert("You have exited the group.");
+      loadGroups();
+    };
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>
 
