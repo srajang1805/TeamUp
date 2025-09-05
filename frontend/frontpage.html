@@ -165,7 +165,7 @@
       Too often, great ideas and exciting opportunities die before they start — not for lack of passion, but for lack of people.
       Whether it’s a 5-player match, a hackathon team, or a study group, finding the right collaborators in time can be a challenge.
     </p>
-    <button class="btn" onclick="window.location.href='login.html'">Get Started</button>
+    <button class="btn" id="startBtn">Get Started</button>
   </section>
 
   <section class="container">
@@ -186,5 +186,25 @@
   <footer>
     © 2025 Collaborator Finder. Built for thriving communities.  
   </footer>
+
+  <script>
+    // Simulated login check
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; // true/false stored in localStorage
+
+    const startBtn = document.getElementById('startBtn');
+    startBtn.addEventListener('click', () => {
+      if (!isLoggedIn) {
+        window.location.href = 'login.html';
+      } else {
+        alert('You are already logged in! Explore the dashboard.');
+      }
+    });
+
+    // Optional: Auto redirect if not logged in
+    // Uncomment this if you want to force login on page load
+    // if (!isLoggedIn) {
+    //   window.location.href = 'login.html';
+    // }
+  </script>
 </body>
 </html>
