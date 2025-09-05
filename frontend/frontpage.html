@@ -8,90 +8,163 @@
     body {
       margin: 0;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: #f9fafc;
-      color: #333;
+      background: radial-gradient(circle at top left, #0d0d2b, #000000 70%);
+      color: #fff;
+      overflow-x: hidden;
     }
+
+    /* Floating glowing stars */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 200%;
+      background: url('https://i.ibb.co/5MfnSkB/stars.png') repeat;
+      background-size: cover;
+      animation: moveStars 60s linear infinite;
+      opacity: 0.4;
+      z-index: -2;
+    }
+
+    @keyframes moveStars {
+      from { transform: translate(0, 0); }
+      to { transform: translate(-500px, -500px); }
+    }
+
     header {
-      background: #ffffff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      padding: 1rem 2rem;
+      background: transparent;
       text-align: center;
+      padding: 1.2rem 1rem 0.5rem;
     }
+
     header h1 {
       margin: 0;
-      font-size: 2rem;
-      color: #007bff;
+      font-size: 2.2rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #00f0ff, #ff00f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: glow 2s ease-in-out infinite alternate;
     }
+
+    .header-logo {
+      width: 110px; /* bigger logo */
+      height: auto;
+      margin-top: 0.6rem;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,240,255,0.5), 0 0 14px rgba(255,0,247,0.5);
+      animation: floatLogo 3s ease-in-out infinite;
+    }
+
+    .slogan {
+      margin-top: 1rem; /* moved lower */
+      font-size: 1.05rem;
+      color: #ccc;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 6px #00f0ff, 0 0 12px #ff00f7; }
+      to { text-shadow: 0 0 12px #00f0ff, 0 0 20px #ff00f7; }
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
     .hero {
       text-align: center;
-      padding: 4rem 2rem;
-      background: linear-gradient(135deg, #e0f0ff, #ffffff);
+      padding: 2rem 1rem 1.5rem;
+      position: relative;
     }
+
     .hero h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      margin-bottom: 0.4rem;
+      color: #00f0ff;
+      text-shadow: 0 0 10px #00f0ff;
     }
     .hero p {
-      font-size: 1.1rem;
-      max-width: 700px;
-      margin: 0 auto 2rem auto;
-      line-height: 1.6;
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto 1.2rem auto;
+      line-height: 1.5;
+      color: #ddd;
     }
+
     .btn {
-      background: #007bff;
+      background: linear-gradient(90deg, #00f0ff, #ff00f7);
       color: white;
       border: none;
-      padding: 0.8rem 1.6rem;
-      border-radius: 6px;
-      font-size: 1rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 25px;
+      font-size: 0.95rem;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px #00f0ff, 0 0 8px #ff00f7;
     }
     .btn:hover {
-      background: #0056b3;
+      transform: scale(1.05);
+      box-shadow: 0 0 14px #00f0ff, 0 0 14px #ff00f7;
     }
+
     .container {
-      max-width: 1000px;
-      margin: 3rem auto;
+      max-width: 900px;
+      margin: 2rem auto;
       padding: 0 1rem;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
     }
+
     .card {
-      background: #fff;
+      background: rgba(20, 20, 50, 0.75);
       border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      transition: transform 0.2s ease;
+      padding: 1rem;
+      box-shadow: 0 0 6px rgba(0, 240, 255, 0.2), 0 0 12px rgba(255, 0, 247, 0.2);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
     .card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.6), 0 0 18px rgba(255, 0, 247, 0.6);
     }
     .card h3 {
       margin-top: 0;
-      color: #007bff;
+      font-size: 1.2rem;
+      color: #ff00f7;
+      text-shadow: 0 0 6px #ff00f7;
     }
+    .card p {
+      color: #ccc;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
     footer {
       text-align: center;
-      padding: 2rem;
-      font-size: 0.9rem;
-      color: #777;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: #aaa;
+      background: transparent;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>Let's Team Up!</h1>
+    <img src="logo.jpeg" alt="Team Up Logo" class="header-logo">
+    <p class="slogan">Find your perfect teammates 🚀</p>
   </header>
-
+  
   <section class="hero">
     <h2>Turn Ideas into Reality</h2>
     <p>
       Too often, great ideas and exciting opportunities die before they start — not for lack of passion, but for lack of people.
       Whether it’s a 5-player match, a hackathon team, or a study group, finding the right collaborators in time can be a challenge.
     </p>
-    <!-- Redirects to login.html -->
     <button class="btn" onclick="window.location.href='login.html'">Get Started</button>
   </section>
 
@@ -115,4 +188,3 @@
   </footer>
 </body>
 </html>
-
