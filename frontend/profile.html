@@ -1,1 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile - Team Up</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 2px 10px rgba(0,255,255,0.2);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; font-size: 1.25rem; color: #00e5ff; text-shadow: 0 0 12px #00e5ff; }
+    nav a {
+      margin-left: 1rem;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      transition: 0.2s;
+    }
+    nav a:hover { background: #00e5ff; color: #000; }
+
+    .profile-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0,255,255,0.2);
+      backdrop-filter: blur(8px);
+      position: relative;
+    }
+
+    .profile-header { text-align: center; margin-bottom: 1.5rem; }
+    .profile-header h2 { margin: 0.3rem 0; color: #00e5ff; }
+    .profile-header p { margin: 0.2rem 0; font-size: 1rem; color: #ddd; }
+
+    .reliability {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      font-size: 2rem; /* bigger stars */
+      color: #ffd700; /* golden */
+      user-select: none;
+    }
+    .reliability span { font-size: 2rem; }
+
+    .section { margin-bottom: 1.5rem; }
+    .section h3 { margin: 0 0 0.8rem 0; color: #00e5ff; font-size: 1.1rem; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag {
+      background: #00e5ff;
+      color: #000;
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .tag:hover { transform: scale(1.05); background: #ff4444; }
+
+    select { 
+      padding: 0.5rem; 
+      border-radius: 6px; 
+      border: none; 
+      font-size: 0.9rem; 
+      margin-top: 0.5rem;
+      background: rgba(0,0,0,0.5); /* darker background */
+      color: #fff; /* white text */
+      outline: none;
+      transition: 0.2s;
+    }
+    select option {
+      background: #0f2027;
+      color: #fff;
+    }
+    select:hover, select:focus {
+      background: rgba(0,0,0,0.7);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Profile</h1>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+  </header>
+
+  <div class="profile-container">
+    <div class="profile-header">
+      <h2 id="name">Loading...</h2>
+      <p id="username">@username</p>
+      <p id="email">email@example.com</p>
+      <div class="reliability" id="reliability">Currently unrated</div>
+    </div>
+
+    <div class="section">
+      <h3>📚 Study Group</h3>
+      <div class="tags" id="study-tags"></div>
+      <select id="study-select">
+        <option value="">+ Add Tag</option>
+        <option value="Math">Math</option>
+        <option value="Science">Science</option>
+        <option value="History">History</option>
+        <option value="Programming">Programming</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <h3>🎮 Gaming</h3>
+      <div class="tags" id="gaming-tags"></div>
+      <select id="gaming-select">
+        <option value="">+ Add Tag</option>
+        <option value="FPS">FPS</option>
+        <option value="MOBA">MOBA</option>
+        <option value="RPG">RPG</option>
+        <option value="Strategy">Strategy</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <h3>💡 Development</h3>
+      <div class="tags" id="dev-tags"></div>
+      <select id="dev-select">
+        <option value="">+ Add Tag</option>
+        <option value="Web">Web</option>
+        <option value="Mobile">Mobile</option>
+        <option value="AI">AI</option>
+        <option value="GameDev">GameDev</option>
+      </select>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
+      authDomain: "teamup-8a9f0.firebaseapp.com",
+      projectId: "teamup-8a9f0",
+      storageBucket: "teamup-8a9f0.firebasestorage.app",
+      messagingSenderId: "348128513327",
+      appId: "1:348128513327:web:577cc99147e834d0b0e5da",
+      measurementId: "G-HQR07FJ6ZT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const nameEl = document.getElementById("name");
+    const usernameEl = document.getElementById("username");
+    const emailEl = document.getElementById("email");
+    const reliabilityText = document.getElementById("reliability");
+
+    const selects = {
+      study: document.getElementById("study-select"),
+      gaming: document.getElementById("gaming-select"),
+      dev: document.getElementById("dev-select")
+    };
+
+    let userRef;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = "login.html";
+      const uid = user.uid;
+      userRef = doc(db, "users", uid);
+
+      let snap = await getDoc(userRef);
+      let data;
+      if (!snap.exists()) {
+        data = {
+          name: user.displayName || "Unnamed",
+          username: user.email.split("@")[0],
+          email: user.email,
+          study: [],
+          gaming: [],
+          dev: [],
+          reliability: null
+        };
+        await setDoc(userRef, data);
+      } else {
+        data = snap.data();
+      }
+
+      nameEl.textContent = data.name;
+      usernameEl.textContent = "@" + (data.username || user.email.split("@")[0]);
+      emailEl.textContent = data.email || user.email;
+
+      // Load reliability
+      if (data.reliability && data.reliability >= 1 && data.reliability <= 5) {
+        reliabilityText.innerHTML = "★".repeat(data.reliability) + "☆".repeat(5 - data.reliability);
+      } else {
+        reliabilityText.textContent = "Currently unrated";
+      }
+
+      // Load tags
+      loadTags("study", Array.isArray(data.study) ? data.study : []);
+      loadTags("gaming", Array.isArray(data.gaming) ? data.gaming : []);
+      loadTags("dev", Array.isArray(data.dev) ? data.dev : []);
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    });
+
+    function loadTags(type, arr) {
+      const container = document.getElementById(type + "-tags");
+      container.innerHTML = "";
+      arr.forEach(val => {
+        const span = document.createElement("span");
+        span.className = "tag";
+        span.textContent = val;
+        span.title = "Click to remove";
+        span.onclick = async () => {
+          const snap = await getDoc(userRef);
+          const data = snap.data();
+          data[type] = data[type].filter(v => v !== val);
+          await updateDoc(userRef, { [type]: data[type] });
+          loadTags(type, data[type]);
+        };
+        container.appendChild(span);
+      });
+    }
+
+    Object.keys(selects).forEach(type => {
+      selects[type].addEventListener("change", async () => {
+        const val = selects[type].value;
+        if (!val) return;
+        const snap = await getDoc(userRef);
+        const data = snap.data();
+        data[type] = data[type] || [];
+        if (!data[type].includes(val)) {
+          data[type].push(val);
+          await updateDoc(userRef, { [type]: data[type] });
+          loadTags(type, data[type]);
+        }
+        selects[type].value = "";
+      });
+    });
+  </script>
+</body>
+</html>
 
