@@ -1,1 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Team Up</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9fafc;
+      color: #333;
+    }
+    header {
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #007bff;
+    }
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+    }
+    nav a:hover {
+      color: #007bff;
+    }
+    .hero {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: linear-gradient(135deg, #e0f0ff, #ffffff);
+    }
+    .hero h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      color: #555;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    ul {
+      padding-left: 1.2rem;
+      margin: 0.5rem 0 0 0;
+      color: #555;
+    }
+    li {
+      margin-bottom: 0.4rem;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 1rem;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Team Up Dashboard</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="team.html">Teams</a>
+      <a href="chat.html">Chats</a>
+      <a href="#">Profile</a>
+      <a href="login.html">Logout</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>Welcome to Your Dashboard</h2>
+    <p>Choose a section to explore: join hackathons, find gaming squads, or study with peers.</p>
+  </section>
+
+  <section class="container">
+    <div class="card">
+      <h3>💡 Development</h3>
+      <ul>
+        <li>Hackathons</li>
+        <li>Projects</li>
+      </ul>
+      <a href="team.html" class="btn">Explore</a>
+    </div>
+    <div class="card">
+      <h3>🎮 Online Games</h3>
+      <ul>
+        <li>PUBG</li>
+        <li>Call of Duty</li>
+        <li>Valorant</li>
+      </ul>
+      <a href="chat.html" class="btn">Find Squad</a>
+    </div>
+    <div class="card">
+      <h3>📚 Study Groups</h3>
+      <ul>
+        <li>College Study Group</li>
+        <li>JEE Study Group</li>
+        <li>UPSC Study Group</li>
+      </ul>
+      <a href="chat.html" class="btn">Join Group</a>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 Collaborator Finder. Built for thriving communities.  
+  </footer>
+</body>
+</html>
 
