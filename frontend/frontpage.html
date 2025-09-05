@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Up</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9fafc;
+      color: #333;
+    }
+    header {
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      padding: 1rem 2rem;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: #007bff;
+    }
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, #e0f0ff, #ffffff);
+    }
+    .hero h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto 2rem auto;
+      line-height: 1.6;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Let's Team Up!</h1>
+  </header>
+
+  <section class="hero">
+    <h2>Turn Ideas into Reality</h2>
+    <p>
+      Too often, great ideas and exciting opportunities die before they start — not for lack of passion, but for lack of people.
+      Whether it’s a 5-player match, a hackathon team, or a study group, finding the right collaborators in time can be a challenge.
+    </p>
+    <!-- Redirects to login.html -->
+    <button class="btn" onclick="window.location.href='login.html'">Get Started</button>
+  </section>
+
+  <section class="container">
+    <div class="card">
+      <h3>🎮 Gaming Squads</h3>
+      <p>Never play solo again. Quickly find teammates for PUBG, COD, Valorant, and more.</p>
+    </div>
+    <div class="card">
+      <h3>💡 Hackathon Teams</h3>
+      <p>Build winning teams with complementary skills. Pair with coders, designers, and innovators in minutes.</p>
+    </div>
+    <div class="card">
+      <h3>📚 Study Groups</h3>
+      <p>Stay motivated by joining study groups for College, JEE, or UPSC. Collaborate and learn together.</p>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 Collaborator Finder. Built for thriving communities.  
+  </footer>
+</body>
+</html>
+
