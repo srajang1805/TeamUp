@@ -1,1 +1,127 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login / Signup - Collaborator Finder</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      /* Gradient background with repeating polka dots */
+      background: 
+        radial-gradient(circle at 20px 20px, rgba(255,255,255,0.3) 4px, transparent 0) repeat,
+        linear-gradient(135deg, #6a11cb, #2575fc);
+      background-size: 40px 40px, cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      color: #333;
+      animation: fadeIn 0.8s ease;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      color: #222;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 100%;
+      padding: 0.9rem;
+      margin: 0.6rem 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      transition: box-shadow 0.2s;
+    }
+    input:focus {
+      box-shadow: 0 0 8px rgba(255,105,180,0.6);
+    }
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #ff6a00, #ee0979);
+      color: #fff;
+      border: none;
+      padding: 0.9rem;
+      margin-top: 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(238,9,121,0.4);
+    }
+    .toggle-link {
+      margin-top: 1rem;
+      display: block;
+      font-size: 0.9rem;
+      color: #333;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .toggle-link:hover {
+      text-decoration: underline;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="form-title">Login</h2>
+    <form id="auth-form">
+      <input type="email" placeholder="Email" required>
+      <input type="password" placeholder="Password" required>
+      <div id="extra-fields" style="display: none;">
+        <input type="text" placeholder="Full Name">
+        <input type="text" placeholder="Username">
+      </div>
+      <button type="submit" class="btn">Submit</button>
+    </form>
+    <a class="toggle-link" onclick="toggleForm()">Don’t have an account? Sign up</a>
+  </div>
+
+  <script>
+    const formTitle = document.getElementById('form-title');
+    const extraFields = document.getElementById('extra-fields');
+    const toggleLink = document.querySelector('.toggle-link');
+    let isSignup = false;
+
+    function toggleForm() {
+      isSignup = !isSignup;
+      if (isSignup) {
+        formTitle.innerText = "Sign Up";
+        extraFields.style.display = "block";
+        toggleLink.innerText = "Already have an account? Login";
+      } else {
+        formTitle.innerText = "Login";
+        extraFields.style.display = "none";
+        toggleLink.innerText = "Don’t have an account? Sign up";
+      }
+    }
+  </script>
+</body>
+</html>
