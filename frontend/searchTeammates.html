@@ -1,1 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Search Teammates - Team Up</title>
+<style>
+  body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f0f4f8; color:#333; margin:0; }
+  header { display:flex; justify-content:space-between; align-items:center; padding:1rem 1.5rem; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
+  header nav a { margin-left:1rem; color:#555; text-decoration:none; font-weight:500; }
+  .container { max-width:1000px; margin:1.5rem auto; padding:0 1rem; }
+  .card { background:#fff; padding:1rem 1.25rem; border-radius:10px; margin-bottom:0.9rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+  .info { display:flex; flex-direction:column; gap:0.25rem; }
+  .info h3 { margin:0; font-size:1.05rem; }
+  .tags { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.25rem; }
+  .tag { background:#6fa8ff; color:#fff; padding:0.25rem 0.5rem; border-radius:6px; font-size:0.82rem; }
+  .stars { color:gold; font-size:1.1rem; margin-top:0.25rem; }
+  .btn { padding:0.45rem 0.9rem; border:none; border-radius:8px; background:#6fa8ff; color:#fff; cursor:pointer; transition:0.16s; }
+  .btn:hover { background:#557ec2; transform:translateY(-2px); }
+  .message { margin:0.5rem 0 1rem 0; color:#444; }
+  .no-matches { text-align:center; color:#666; padding:1.2rem; background:#fff; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.04); }
+</style>
+</head>
+<body>
+<header>
+  <div><strong>Search Teammates</strong></div>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="profile.html">Profile</a>
+    <a href="login.html">Logout</a>
+  </nav>
+</header>
+
+<main class="container">
+  <div id="matchesContainer"></div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, doc, getDoc, collection, getDocs, addDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+// ---------- CONFIG ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
+  authDomain: "teamup-8a9f0.firebaseapp.com",
+  projectId: "teamup-8a9f0"
+};
+// ----------------------------
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const matchesContainer = document.getElementById('matchesContainer');
+
+// safe HTML escape
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function showError(msg) {
+  matchesContainer.innerHTML = `<div class="no-matches">${escapeHtml(msg)}</div>`;
+}
+
+// read groupId from URL
+const urlParams = new URLSearchParams(window.location.search);
+const groupId = urlParams.get('groupId') || null;
+
+let currentUser = null;
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+  currentUser = user;
+  try {
+    await loadMatches();
+  } catch (err) {
+    console.error(err);
+    showError(`Error: ${err.code || err.message || err}. Check console for details.`);
+  }
+});
+
+async function loadMatches() {
+  matchesContainer.innerHTML = '<div class="message">Loading matches…</div>';
+  if (!groupId) {
+    showError('No group selected. Make sure you came from a group page.');
+    return;
+  }
+
+  const groupRef = doc(db, 'groups', groupId);
+  const groupSnap = await getDoc(groupRef);
+  if (!groupSnap.exists()) {
+    showError('Group not found.');
+    return;
+  }
+  const group = groupSnap.data();
+
+  const groupTags = (group.tags || []).map(t => String(t || '').trim()).filter(t => t !== '');
+  if (groupTags.length === 0) {
+    showError('This group has no tags to match on.');
+    return;
+  }
+  const groupTagsLower = groupTags.map(t => t.toLowerCase());
+
+  let userDocs = [];
+  try {
+    const chunk = groupTags.slice(0, 10);
+    const q = query(collection(db, 'users'), where('study', 'array-contains-any', chunk));
+    const qsnap = await getDocs(q);
+    qsnap.forEach(d => userDocs.push(d));
+  } catch (err) {
+    if (err.code === 'permission-denied') {
+      showError('Permission denied when reading users. Update Firestore rules.');
+      return;
+    }
+  }
+
+  if (userDocs.length === 0) {
+    try {
+      const all = await getDocs(collection(db, 'users'));
+      all.forEach(d => userDocs.push(d));
+    } catch (err) {
+      if (err.code === 'permission-denied') {
+        showError('Permission denied when reading users. Update Firestore rules.');
+        return;
+      } else {
+        throw err;
+      }
+    }
+  }
+
+  const results = [];
+  for (const userDoc of userDocs) {
+    const userData = userDoc.data();
+    const docId = userDoc.id;
+    if (docId === currentUser.uid) continue;
+
+    const userStudyRaw = Array.isArray(userData.study) ? userData.study : [];
+    const userStudyLower = userStudyRaw.map(x => String(x || '').trim()).filter(x => x !== '').map(x => x.toLowerCase());
+
+    const common = userStudyLower.filter(tag => groupTagsLower.includes(tag));
+    if (common.length > 0) {
+      results.push({ id: docId, data: userData, commonTags: common });
+    }
+  }
+
+  if (results.length === 0) {
+    matchesContainer.innerHTML = `<div class="no-matches">No matching teammates found for tags: ${escapeHtml(groupTags.join(', '))}</div>`;
+    return;
+  }
+
+  matchesContainer.innerHTML = '<h2>Matching Teammates</h2>';
+  results.forEach(r => {
+    const u = r.data;
+    const reliability = Number.isFinite(u.reliability) ? Math.max(0, Math.min(5, Math.floor(u.reliability))) : 0;
+    const stars = reliability ? '★'.repeat(reliability) + '☆'.repeat(5 - reliability) : 'Currently Unrated';
+    const studyTags = Array.isArray(u.study) ? u.study : [];
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="info">
+        <h3>${escapeHtml(u.name || 'Unnamed')}</h3>
+        <div>@${escapeHtml(u.username || (u.email ? u.email.split('@')[0] : 'user'))}</div>
+        <div class="tags">${studyTags.map(t => `<span class="tag">${escapeHtml(String(t))}</span>`).join('')}</div>
+        <div class="stars">${escapeHtml(stars)}</div>
+        <div style="font-size:12px;color:#666;margin-top:6px">common: ${escapeHtml(r.commonTags.join(', '))}</div>
+      </div>
+      <div>
+        <button class="btn" onclick="sendInvite('${escapeHtml(r.id)}')">Send Invite</button>
+      </div>
+    `;
+    matchesContainer.appendChild(card);
+  });
+
+  window.scrollTo({ top: matchesContainer.offsetTop - 20, behavior: 'smooth' });
+}
+
+window.sendInvite = async function(targetUserId) {
+  try {
+    await addDoc(collection(db, 'groupInvites'), {
+      groupId: groupId,
+      userId: targetUserId,
+      inviterId: (auth.currentUser ? auth.currentUser.uid : null),
+      status: 'pending',
+      timestamp: serverTimestamp()
+    });
+    alert('Invite sent!');
+  } catch (err) {
+    if (err.code === 'permission-denied') {
+      alert('Permission denied while sending invite. Check Firestore rules.');
+    } else {
+      alert('Failed to send invite: ' + (err.message || err));
+    }
+  }
+};
+</script>
+</body>
+</html>
 
