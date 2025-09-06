@@ -76,26 +76,13 @@
     }
 
     @keyframes neonGlow {
-      from {
-        text-shadow: 0 0 5px #ff66cc, 0 0 10px #66a3ff;
-      }
-      to {
-        text-shadow: 0 0 15px #ff66cc, 0 0 20px #66a3ff;
-      }
+      from { text-shadow: 0 0 5px #ff66cc, 0 0 10px #66a3ff; }
+      to { text-shadow: 0 0 15px #ff66cc, 0 0 20px #66a3ff; }
     }
 
     .profile-header { text-align: center; margin-bottom: 1.5rem; }
     .profile-header h2 { margin: 0.3rem 0; color: #ff66cc; }
     .profile-header p { margin: 0.2rem 0; font-size: 1rem; color: #ccc; }
-
-    .reliability {
-      position: absolute;
-      top: 2rem;
-      right: 2rem;
-      font-size: 2rem;
-      color: #ffd700;
-      user-select: none;
-    }
 
     .section { margin-bottom: 1.5rem; }
     .section h3 { margin-bottom: 0.8rem; color: #ff66cc; font-size: 1.1rem; }
@@ -110,10 +97,7 @@
       font-size: 0.9rem;
       transition: transform 0.15s, box-shadow 0.15s;
     }
-    .tag:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 12px #ff66cc, 0 0 12px #66a3ff;
-    }
+    .tag:hover { transform: scale(1.05); box-shadow: 0 0 12px #ff66cc, 0 0 12px #66a3ff; }
 
     select {
       padding: 0.5rem;
@@ -126,12 +110,15 @@
       outline: none;
       transition: 0.2s;
     }
-    select option {
-      background: #1a1a1a;
-      color: #fff;
-    }
-    select:hover, select:focus {
-      background: rgba(0,0,0,0.7);
+    select option { background: #1a1a1a; color: #fff; }
+    select:hover, select:focus { background: rgba(0,0,0,0.7); }
+
+    /* Moved reliability lower */
+    .reliability {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #ffd700;
+      margin-top: 2rem;
     }
   </style>
 </head>
@@ -153,7 +140,6 @@
       <h2 id="name">Loading...</h2>
       <p id="username">@username</p>
       <p id="email">email@example.com</p>
-      <div class="reliability" id="reliability">Currently unrated</div>
     </div>
 
     <div class="section">
@@ -194,6 +180,9 @@
         <option value="Cyber Security">Cyber Security</option>
       </select>
     </div>
+
+    <!-- Moved reliability here -->
+    <div class="reliability" id="reliability">Currently unrated</div>
   </div>
 
   <script type="module">
