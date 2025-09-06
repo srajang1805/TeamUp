@@ -27,7 +27,7 @@
   <nav>
     <a href="dashboard.html">Dashboard</a>
     <a href="profile.html">Profile</a>
-    <a href="login.html">Logout</a>
+    <a href="login.html" id="logoutBtn">Logout</a>
   </nav>
 </header>
 
@@ -38,7 +38,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getFirestore, doc, getDoc, collection, getDocs, addDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
 // ---------- CONFIG ----------
 const firebaseConfig = {
@@ -73,6 +73,12 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
   currentUser = user;
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = 'login.html';
+  });
+
   try {
     await loadMatches();
   } catch (err) {
@@ -95,8 +101,7 @@ async function loadMatches() {
     return;
   }
   const group = groupSnap.data();
-
-  const groupTags = (group.tags || []).map(t => String(t || '').trim()).filter(t => t !== '');
+  const groupTags = (group.tags || []).map(t => String(t).trim()).filter(t => t !== '');
   if (groupTags.length === 0) {
     showError('This group has no tags to match on.');
     return;
@@ -105,57 +110,47 @@ async function loadMatches() {
 
   let userDocs = [];
   try {
-    const chunk = groupTags.slice(0, 10);
-    const q = query(collection(db, 'users'), where('study', 'array-contains-any', chunk));
-    const qsnap = await getDocs(q);
-    qsnap.forEach(d => userDocs.push(d));
-  } catch (err) {
-    if (err.code === 'permission-denied') {
-      showError('Permission denied when reading users. Update Firestore rules.');
-      return;
+    // Firestore only allows 10 values for array-contains-any
+    const chunks = [];
+    for (let i = 0; i < groupTags.length; i += 10) {
+      chunks.push(groupTags.slice(i, i + 10));
     }
+    for (const chunk of chunks) {
+      const q = query(collection(db, 'users'), where('study', 'array-contains-any', chunk));
+      const qsnap = await getDocs(q);
+      qsnap.forEach(d => userDocs.push(d));
+    }
+  } catch (err) {
+    showError('Error fetching users. Check Firestore rules.');
+    console.error(err);
+    return;
   }
+
+  // Remove duplicates and exclude current user
+  const seen = new Set();
+  userDocs = userDocs.filter(u => {
+    if (u.id === currentUser.uid) return false;
+    if (seen.has(u.id)) return false;
+    seen.add(u.id);
+    return true;
+  });
 
   if (userDocs.length === 0) {
-    try {
-      const all = await getDocs(collection(db, 'users'));
-      all.forEach(d => userDocs.push(d));
-    } catch (err) {
-      if (err.code === 'permission-denied') {
-        showError('Permission denied when reading users. Update Firestore rules.');
-        return;
-      } else {
-        throw err;
-      }
-    }
-  }
-
-  const results = [];
-  for (const userDoc of userDocs) {
-    const userData = userDoc.data();
-    const docId = userDoc.id;
-    if (docId === currentUser.uid) continue;
-
-    const userStudyRaw = Array.isArray(userData.study) ? userData.study : [];
-    const userStudyLower = userStudyRaw.map(x => String(x || '').trim()).filter(x => x !== '').map(x => x.toLowerCase());
-
-    const common = userStudyLower.filter(tag => groupTagsLower.includes(tag));
-    if (common.length > 0) {
-      results.push({ id: docId, data: userData, commonTags: common });
-    }
-  }
-
-  if (results.length === 0) {
-    matchesContainer.innerHTML = `<div class="no-matches">No matching teammates found for tags: ${escapeHtml(groupTags.join(', '))}</div>`;
+    showError(`No matching teammates found for tags: ${escapeHtml(groupTags.join(', '))}`);
     return;
   }
 
   matchesContainer.innerHTML = '<h2>Matching Teammates</h2>';
-  results.forEach(r => {
-    const u = r.data;
+  userDocs.forEach(userDoc => {
+    const u = userDoc.data();
+    const userStudy = Array.isArray(u.study) ? u.study : [];
+    const userStudyLower = userStudy.map(x => String(x || '').trim().toLowerCase());
+    const commonTags = groupTagsLower.filter(tag => userStudyLower.includes(tag));
+
+    if (commonTags.length === 0) return;
+
     const reliability = Number.isFinite(u.reliability) ? Math.max(0, Math.min(5, Math.floor(u.reliability))) : 0;
     const stars = reliability ? '★'.repeat(reliability) + '☆'.repeat(5 - reliability) : 'Currently Unrated';
-    const studyTags = Array.isArray(u.study) ? u.study : [];
 
     const card = document.createElement('div');
     card.className = 'card';
@@ -163,31 +158,37 @@ async function loadMatches() {
       <div class="info">
         <h3>${escapeHtml(u.name || 'Unnamed')}</h3>
         <div>@${escapeHtml(u.username || (u.email ? u.email.split('@')[0] : 'user'))}</div>
-        <div class="tags">${studyTags.map(t => `<span class="tag">${escapeHtml(String(t))}</span>`).join('')}</div>
+        <div class="tags">${userStudy.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
         <div class="stars">${escapeHtml(stars)}</div>
-        <div style="font-size:12px;color:#666;margin-top:6px">common: ${escapeHtml(r.commonTags.join(', '))}</div>
+        <div style="font-size:12px;color:#666;margin-top:6px">common: ${escapeHtml(commonTags.join(', '))}</div>
       </div>
       <div>
-        <button class="btn" onclick="sendInvite('${escapeHtml(r.id)}')">Send Invite</button>
+        <button class="btn" onclick="sendInvite('${escapeHtml(userDoc.id)}')">Send Invite</button>
       </div>
     `;
     matchesContainer.appendChild(card);
   });
 
+  if (!matchesContainer.hasChildNodes()) {
+    showError(`No matching teammates found for tags: ${escapeHtml(groupTags.join(', '))}`);
+  }
+
   window.scrollTo({ top: matchesContainer.offsetTop - 20, behavior: 'smooth' });
 }
 
+// Send group invite
 window.sendInvite = async function(targetUserId) {
   try {
     await addDoc(collection(db, 'groupInvites'), {
-      groupId: groupId,
+      groupId,
       userId: targetUserId,
-      inviterId: (auth.currentUser ? auth.currentUser.uid : null),
+      inviterId: currentUser.uid,
       status: 'pending',
       timestamp: serverTimestamp()
     });
     alert('Invite sent!');
   } catch (err) {
+    console.error(err);
     if (err.code === 'permission-denied') {
       alert('Permission denied while sending invite. Check Firestore rules.');
     } else {
@@ -198,4 +199,3 @@ window.sendInvite = async function(targetUserId) {
 </script>
 </body>
 </html>
-
