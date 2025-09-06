@@ -1,308 +1,372 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard - Team Up</title>
-  <style>
-    /* Neon Galaxy Background */
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
-      color: #fff;
-      overflow-x: hidden;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Team Up Dashboard</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(circle at top left, #ff4da6, transparent 40%),
+                radial-gradient(circle at bottom right, #4d88ff, transparent 40%),
+                radial-gradient(circle at center, #0d0d0d, #000 80%);
+    color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-    /* Particle effect container */
-    .particles {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
+  header {
+    background: rgba(20, 20, 30, 0.9);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 0 12px rgba(255,105,180,0.3);
+  }
 
-    .particle {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: rgba(0, 255, 255, 0.8);
-      border-radius: 50%;
-      animation: float 10s infinite linear;
-    }
+  header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    background: linear-gradient(90deg, #ff66cc, #66a3ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+  }
 
-    @keyframes float {
-      from {
-        transform: translateY(100vh) scale(0.5);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(-10vh) scale(1.2);
-        opacity: 1;
-      }
-    }
+  nav a {
+    text-decoration: none;
+    color: #ccc;
+    margin-left: 1rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    transition: 0.3s;
+  }
 
-    header {
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 2px 10px rgba(0,255,255,0.2);
-      padding: 1rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      z-index: 2;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.25rem;
-      color: #00e5ff;
-      text-shadow: 0 0 12px #00e5ff;
-    }
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-    nav a {
-      margin: 0 0.25rem;
-      text-decoration: none;
-      color: #fff;
-      font-weight: 500;
-      transition: color 0.2s;
-      padding: 0.35rem 0.6rem;
-      border-radius: 6px;
-    }
-    nav a:hover {
-      color: #000;
-      background: #00e5ff;
-      text-shadow: none;
-    }
+  nav a:hover {
+    color: #000;
+    background: linear-gradient(90deg, #ff66cc, #66a3ff);
+  }
 
-    .hero {
-      text-align: center;
-      padding: 2.25rem 1rem;
-      background: rgba(255,255,255,0.03);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      position: relative;
-      z-index: 2;
-    }
-    .hero h2 {
-      font-size: 1.6rem;
-      margin: 0 0 0.6rem 0;
-      color: #00e5ff;
-      text-shadow: 0 0 8px #00e5ff;
-    }
-    .hero p {
-      font-size: 1rem;
-      color: #ddd;
-      max-width: 700px;
-      margin: 0 auto 0.9rem auto;
-    }
-    .welcome {
-      font-size: 1.05rem;
-      color: #fff;
-      margin-bottom: 0.25rem;
-      font-weight: 600;
-    }
+  .hero {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
 
-    .container {
-      max-width: 1100px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.25rem;
-      position: relative;
-      z-index: 2;
-    }
-    .card {
-      background: rgba(255,255,255,0.04);
-      border-radius: 10px;
-      padding: 1.2rem;
-      box-shadow: 0 4px 14px rgba(0,255,255,0.08);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      backdrop-filter: blur(6px);
-    }
-    .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 10px 30px rgba(0,255,255,0.18);
-    }
-    .card h3 {
-      margin: 0 0 0.6rem 0;
-      color: #00e5ff;
-      font-size: 1.1rem;
-    }
-    ul { margin: 0; padding-left: 1rem; color: #eee; }
-    li { margin-bottom: 0.35rem; }
+  .hero h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, #ff66cc, #66a3ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-    .btn {
-      display: inline-block;
-      margin-top: 0.9rem;
-      background: #00e5ff;
-      color: #000;
-      border: none;
-      padding: 0.5rem 0.9rem;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform 0.15s, background 0.15s;
-      box-shadow: 0 0 10px rgba(0,229,255,0.12);
-    }
-    .btn:hover {
-      background: #00bcd4;
-      transform: translateY(-2px);
-    }
+  .hero p {
+    font-size: 1.15rem;
+    max-width: 750px;
+    margin: 0 auto 1.5rem;
+    color: #ccc;
+    line-height: 1.7;
+  }
 
-    footer {
-      text-align: center;
-      padding: 1.2rem;
-      font-size: 0.85rem;
-      color: #aaa;
-      position: relative;
-      z-index: 2;
-    }
+  .main-content {
+    display: flex;
+    gap: 1.25rem;
+    max-width: 1200px;
+    margin: 0 auto 2rem auto;
+    padding: 0 1rem;
+  }
 
-    /* small responsive tweaks */
-    @media (max-width: 540px) {
-      header { padding: 0.75rem; }
-      .hero { padding: 1.6rem 0.8rem; }
-      .container { margin: 1.25rem auto; gap: 0.9rem; }
-      header h1 { font-size: 1.05rem; }
-    }
-  </style>
+  .left, .right {
+    width: 240px;
+    background: rgba(20,20,30,0.9);
+    border-radius: 14px;
+    padding: 1rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 20px rgba(70,130,255,0.25), 0 0 16px rgba(255,105,180,0.2);
+    overflow-y: auto;
+    max-height: 650px;
+  }
+
+  .center {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: rgba(20, 20, 30, 0.9);
+    border-radius: 18px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(70,130,255,0.25), 0 0 16px rgba(255,105,180,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 25px rgba(255, 102, 204, 0.4), 0 0 20px rgba(102, 163, 255, 0.4);
+  }
+
+  .card h3 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    background: linear-gradient(90deg, #ff66cc, #66a3ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+
+  .card p {
+    color: #ccc;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .btn {
+    background: linear-gradient(90deg, #ff4da6, #4d88ff);
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0.8rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    background: linear-gradient(90deg, #ff66cc, #66a3ff);
+    box-shadow: 0 0 12px rgba(255,105,180,0.5), 0 0 12px rgba(70,130,255,0.5);
+    transform: translateY(-2px);
+  }
+
+  h4 {
+    color: #ff66cc;
+    margin-bottom: 0.75rem;
+    font-size: 1.15rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 0.25rem;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+    padding: 0.8rem 0.8rem;
+    border-radius: 12px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.05);
+    color: #ccc;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 6px rgba(255,105,180,0.2), 0 0 4px rgba(70,130,255,0.2);
+    display: flex;
+    flex-direction: column;
+  }
+
+  li:hover {
+    background: linear-gradient(90deg, #ff66cc, #66a3ff);
+    color: #000;
+    box-shadow: 0 0 12px rgba(255,105,180,0.5), 0 0 12px rgba(70,130,255,0.5);
+    transform: translateX(3px);
+  }
+
+  .li-title {
+    font-weight: 700;
+  }
+
+  .li-msg {
+    font-size: 0.9rem;
+    color: #ddd;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .li-meta {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-top: 2px;
+    text-align: right;
+  }
+
+  .left::-webkit-scrollbar, .right::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .left::-webkit-scrollbar-thumb, .right::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff66cc, #66a3ff);
+    border-radius: 8px;
+  }
+
+  .left::-webkit-scrollbar-track, .right::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+  }
+
+  @media (max-width: 900px) {
+    .main-content { flex-direction: column; }
+    .left, .right { width: 100%; max-height: 300px; }
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.95rem;
+    color: #aaa;
+    margin-top: auto;
+  }
+</style>
 </head>
+
 <body>
-  <!-- Particle background container -->
-  <div class="particles"></div>
+<header>
+  <h1>Team Up</h1>
+  <nav>
+    <a href="dashboard.html">Home</a>
+    <a href="invite.html">Invites</a>
+    <a href="chat.html">Chats</a>
+    <a href="mygroups.html">My Groups</a>
+    <a href="profile.html">Profile</a>
+    <a href="#" id="logoutBtn">Logout</a>
+  </nav>
+</header>
 
-  <header>
-    <h1>Team Up Dashboard</h1>
-    <nav>
-      <a href="dashboard.html">Home</a>
-      <a href="team.html">Teams</a>
-      <a href="invite.html">Invites</a> <!-- ✅ New tab -->
-      <a href="chat.html">Chats</a>
-      <a href="mygroups.html">My Groups</a>
-      <a href="profile.html" id="profileLink">Profile</a>
-      <a href="#" id="logoutBtn">Logout</a>
-    </nav>
-  </header>
+<section class="hero">
+  <h2 id="welcomeUser">Welcome!</h2>
+  <p id="heroText">Collaborate, compete, and grow with like-minded people. Find your teams, games, or study groups and start connecting today.</p>
+</section>
 
-  <section class="hero">
-    <div class="welcome" id="welcomeMessage">Welcome</div>
-    <h2 id="hero-title">Your hub for collaboration</h2>
-    <p id="hero-desc">Choose a section to explore: join hackathons, find gaming squads, or study with peers.</p>
-  </section>
+<section class="main-content">
+  <!-- Left Panel: Recent Chats -->
+  <div class="left">
+    <h4>Recent Chats</h4>
+    <ul id="recentChats">
+      <li>Loading...</li>
+    </ul>
+  </div>
 
-  <section class="container">
+  <!-- Center Panel: Dev/Games/Study -->
+  <div class="center">
     <div class="card">
-      <h3>💡 Development</h3>
-      <ul>
-        <li>Hackathons</li>
-        <li>Projects</li>
-      </ul>
-      <a href="team.html" class="btn">Explore</a>
+      <h3>Development</h3>
+      <p>Join hackathons, collaborate on coding projects, and enhance your skills with dev teams.</p>
+      <button class="btn" onclick="location.href='devl.html'">Explore</button>
     </div>
-
     <div class="card">
-      <h3>🎮 Online Games</h3>
-      <ul>
-        <li>PUBG</li>
-        <li>Call of Duty</li>
-        <li>Valorant</li>
-      </ul>
-      <a href="chat.html" class="btn">Find Squad</a>
+      <h3>Online Games</h3>
+      <p>Find teammates for PUBG, COD, Valorant, and more. Never play solo again.</p>
+      <button class="btn" onclick="location.href='game.html'">Find Squad</button>
     </div>
-
     <div class="card">
-      <h3>📚 Study Groups</h3>
-      <ul>
-        <li>College Study Group</li>
-        <li>JEE Study Group</li>
-        <li>UPSC Study Group</li>
-      </ul>
-      <a href="studygroup.html" class="btn">Join Group</a>
+      <h3>Study Groups</h3>
+      <p>Stay motivated by joining study groups for College, JEE, or UPSC. Learn and grow together.</p>
+      <button class="btn" onclick="location.href='studygroup.html'">Join Group</button>
     </div>
-  </section>
+  </div>
 
-  <footer>
-    © 2025 Collaborator Finder. Built for thriving communities.
-  </footer>
+  <!-- Right Panel: My Groups -->
+  <div class="right">
+    <h4>My Groups</h4>
+    <ul id="myGroups">
+      <li>Loading...</li>
+    </ul>
+  </div>
+</section>
 
-  <!-- Script to generate random particles -->
-  <script>
-    const particlesContainer = document.querySelector('.particles');
-    for (let i = 0; i < 40; i++) {
-      const particle = document.createElement('div');
-      particle.classList.add('particle');
-      particle.style.left = Math.random() * 100 + "vw";
-      particle.style.animationDuration = (6 + Math.random() * 6) + "s";
-      particle.style.opacity = 0.3 + Math.random() * 0.7;
-      const size = 2 + Math.random() * 6;
-      particle.style.width = particle.style.height = size + "px";
-      particlesContainer.appendChild(particle);
+<footer>© 2025 Team Up. Built for thriving communities.</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
+  authDomain: "teamup-8a9f0.firebaseapp.com",
+  projectId: "teamup-8a9f0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const welcomeUser = document.getElementById("welcomeUser");
+const recentChatsList = document.getElementById("recentChats");
+const myGroupsList = document.getElementById("myGroups");
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = "login.html"; return; }
+  welcomeUser.textContent = `Welcome, ${user.displayName || 'User'}!`;
+
+  loadRecentChats(user.uid);
+  loadMyGroups(user.uid);
+});
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "login.html";
+});
+
+// --- Load recent chats ---
+async function loadRecentChats(uid) {
+  const groupsCol = collection(db, "groups");
+  onSnapshot(groupsCol, async snapshot => {
+    recentChatsList.innerHTML = "";
+    for (const gDoc of snapshot.docs) {
+      const gData = gDoc.data();
+      if (!gData.members.includes(uid)) continue;
+
+      const chatCol = collection(db, "groups", gDoc.id, "chat");
+      const lastMsgQuery = query(chatCol, orderBy("timestamp","desc"), limit(1));
+      const lastMsgSnap = await getDocs(lastMsgQuery);
+      let lastMsg = lastMsgSnap.docs[0]?.data();
+      let senderName = "Unknown";
+      if(lastMsg){
+        const userDoc = await getDoc(doc(db,"users", lastMsg.sender));
+        senderName = userDoc.exists() ? userDoc.data().name : "Unknown";
+      }
+
+      const li = document.createElement("li");
+      li.innerHTML = `<div class="li-title">${gData.name}</div>
+                      <div class="li-msg">${lastMsg ? lastMsg.text : 'No messages yet'}</div>
+                      <div class="li-meta">${lastMsg ? senderName + " | " + (lastMsg.timestamp?.toDate().toLocaleTimeString() || '') : ''}</div>`;
+      li.onclick = () => window.location.href=`chat.html?groupId=${gDoc.id}`;
+      recentChatsList.appendChild(li);
     }
-  </script>
+    if(!recentChatsList.children.length) recentChatsList.innerHTML="<li>No recent chats</li>";
+  });
+}
 
-  <!-- Firebase integration -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+// --- Load my groups ---
+async function loadMyGroups(uid){
+  const groupsCol = collection(db,"groups");
+  onSnapshot(groupsCol, async snapshot=>{
+    myGroupsList.innerHTML="";
+    for(const gDoc of snapshot.docs){
+      const gData=gDoc.data();
+      if(!gData.members.includes(uid)) continue;
+      const li = document.createElement("li");
+      li.textContent = gData.name;
+      li.onclick = ()=>window.location.href=`chat.html?groupId=${gDoc.id}`;
+      myGroupsList.appendChild(li);
+    }
+    if(!myGroupsList.children.length) myGroupsList.innerHTML="<li>No groups</li>";
+  });
+}
+</script>
 
-    // Your Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
-      authDomain: "teamup-8a9f0.firebaseapp.com",
-      projectId: "teamup-8a9f0",
-      storageBucket: "teamup-8a9f0.firebasestorage.app",
-      messagingSenderId: "348128513327",
-      appId: "1:348128513327:web:577cc99147e834d0b0e5da",
-      measurementId: "G-HQR07FJ6ZT"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // Protect page and show user info
-    const welcomeEl = document.getElementById('welcomeMessage');
-    const heroTitle = document.getElementById('hero-title');
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const name = user.displayName && user.displayName.trim() 
-          ? user.displayName 
-          : (user.email ? user.email.split('@')[0] : 'Member');
-        welcomeEl.textContent = `Welcome, ${name}!`;
-        heroTitle.textContent = "Your hub for collaboration";
-      } else {
-        window.location.href = "login.html";
-      }
-    });
-
-    // Logout
-    const logoutBtn = document.getElementById('logoutBtn');
-    logoutBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        await signOut(auth);
-        window.location.href = "login.html";
-      } catch (err) {
-        console.error("Logout error:", err);
-        alert("Failed to logout — try again.");
-      }
-    });
-
-    // Profile redirect
-    document.getElementById('profileLink').addEventListener('click', (e) => {
-      e.preventDefault();
-      window.location.href = "profile.html";
-    });
-  </script>
 </body>
 </html>
