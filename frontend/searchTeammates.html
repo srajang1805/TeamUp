@@ -37,7 +37,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs, addDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
 // ---------- CONFIG ----------
@@ -46,8 +46,6 @@ const firebaseConfig = {
   authDomain: "teamup-8a9f0.firebaseapp.com",
   projectId: "teamup-8a9f0"
 };
-// ----------------------------
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -68,10 +66,7 @@ const groupId = urlParams.get('groupId') || null;
 let currentUser = null;
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = 'login.html';
-    return;
-  }
+  if (!user) { window.location.href = 'login.html'; return; }
   currentUser = user;
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -79,61 +74,33 @@ onAuthStateChanged(auth, async (user) => {
     window.location.href = 'login.html';
   });
 
-  try {
-    await loadMatches();
-  } catch (err) {
-    console.error(err);
-    showError(`Error: ${err.code || err.message || err}. Check console for details.`);
-  }
+  try { await loadMatches(); }
+  catch(err) { console.error(err); showError(`Error: ${err.code || err.message || err}.`); }
 });
 
 async function loadMatches() {
   matchesContainer.innerHTML = '<div class="message">Loading matches…</div>';
-  if (!groupId) {
-    showError('No group selected. Make sure you came from a group page.');
-    return;
-  }
+  if (!groupId) { showError('No group selected.'); return; }
 
   const groupRef = doc(db, 'groups', groupId);
   const groupSnap = await getDoc(groupRef);
-  if (!groupSnap.exists()) {
-    showError('Group not found.');
-    return;
-  }
+  if (!groupSnap.exists()) { showError('Group not found.'); return; }
   const group = groupSnap.data();
-  const groupTags = (group.tags || []).map(t => String(t).trim()).filter(t => t !== '');
-  if (groupTags.length === 0) {
-    showError('This group has no tags to match on.');
-    return;
-  }
-  const groupTagsLower = groupTags.map(t => t.toLowerCase());
+  const groupTags = (group.tags || []).map(t => String(t).trim()).filter(t=>t!=='');
+  if (groupTags.length===0) { showError('This group has no tags.'); return; }
+  const groupTagsLower = groupTags.map(t=>t.toLowerCase());
 
   let userDocs = [];
-  try {
-    // Firestore only allows 10 values for array-contains-any
-    const chunks = [];
-    for (let i = 0; i < groupTags.length; i += 10) {
-      chunks.push(groupTags.slice(i, i + 10));
-    }
-    for (const chunk of chunks) {
-      const q = query(collection(db, 'users'), where('study', 'array-contains-any', chunk));
-      const qsnap = await getDocs(q);
-      qsnap.forEach(d => userDocs.push(d));
-    }
-  } catch (err) {
-    showError('Error fetching users. Check Firestore rules.');
-    console.error(err);
-    return;
+  const chunkSize = 10; // Firestore limit for array-contains-any
+  for (let i=0; i<groupTags.length; i+=chunkSize) {
+    const qChunk = groupTags.slice(i,i+chunkSize);
+    const q = collection(db,'users');
+    const qsnap = await getDocs(q);
+    qsnap.forEach(d => userDocs.push(d));
   }
 
-  // Remove duplicates and exclude current user
   const seen = new Set();
-  userDocs = userDocs.filter(u => {
-    if (u.id === currentUser.uid) return false;
-    if (seen.has(u.id)) return false;
-    seen.add(u.id);
-    return true;
-  });
+  userDocs = userDocs.filter(u => u.id !== currentUser.uid && !seen.has(u.id) && seen.add(u.id));
 
   if (userDocs.length === 0) {
     showError(`No matching teammates found for tags: ${escapeHtml(groupTags.join(', '))}`);
@@ -141,24 +108,23 @@ async function loadMatches() {
   }
 
   matchesContainer.innerHTML = '<h2>Matching Teammates</h2>';
-  userDocs.forEach(userDoc => {
+  for (const userDoc of userDocs) {
     const u = userDoc.data();
-    const userStudy = Array.isArray(u.study) ? u.study : [];
-    const userStudyLower = userStudy.map(x => String(x || '').trim().toLowerCase());
+    const userStudy = Array.isArray(u.study)? u.study : [];
+    const userStudyLower = userStudy.map(x=>String(x||'').trim().toLowerCase());
     const commonTags = groupTagsLower.filter(tag => userStudyLower.includes(tag));
+    if (commonTags.length===0) continue;
 
-    if (commonTags.length === 0) return;
-
-    const reliability = Number.isFinite(u.reliability) ? Math.max(0, Math.min(5, Math.floor(u.reliability))) : 0;
-    const stars = reliability ? '★'.repeat(reliability) + '☆'.repeat(5 - reliability) : 'Currently Unrated';
+    const reliability = Number.isFinite(u.reliability)? Math.max(0,Math.min(5,Math.floor(u.reliability))) : 0;
+    const stars = reliability? '★'.repeat(reliability)+'☆'.repeat(5-reliability) : 'Currently Unrated';
 
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
       <div class="info">
-        <h3>${escapeHtml(u.name || 'Unnamed')}</h3>
-        <div>@${escapeHtml(u.username || (u.email ? u.email.split('@')[0] : 'user'))}</div>
-        <div class="tags">${userStudy.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+        <h3>${escapeHtml(u.name||'Unnamed')}</h3>
+        <div>@${escapeHtml(u.username||(u.email?u.email.split('@')[0]:'user'))}</div>
+        <div class="tags">${userStudy.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
         <div class="stars">${escapeHtml(stars)}</div>
         <div style="font-size:12px;color:#666;margin-top:6px">common: ${escapeHtml(commonTags.join(', '))}</div>
       </div>
@@ -167,33 +133,28 @@ async function loadMatches() {
       </div>
     `;
     matchesContainer.appendChild(card);
-  });
-
-  if (!matchesContainer.hasChildNodes()) {
-    showError(`No matching teammates found for tags: ${escapeHtml(groupTags.join(', '))}`);
   }
 
-  window.scrollTo({ top: matchesContainer.offsetTop - 20, behavior: 'smooth' });
+  if (!matchesContainer.hasChildNodes()) showError(`No matching teammates found.`);
+  window.scrollTo({top: matchesContainer.offsetTop-20, behavior:'smooth'});
 }
 
-// Send group invite
+// Send group invite (adds to group's requests array)
 window.sendInvite = async function(targetUserId) {
+  if (!groupId) return alert("No group selected.");
+  const groupRef = doc(db,'groups',groupId);
+  const groupSnap = await getDoc(groupRef);
+  if (!groupSnap.exists()) return alert("Group not found.");
+  const group = groupSnap.data();
+  const requests = Array.isArray(group.requests)? group.requests : [];
+
+  if (requests.includes(targetUserId)) return alert("User already invited!");
   try {
-    await addDoc(collection(db, 'groupInvites'), {
-      groupId,
-      userId: targetUserId,
-      inviterId: currentUser.uid,
-      status: 'pending',
-      timestamp: serverTimestamp()
-    });
-    alert('Invite sent!');
-  } catch (err) {
+    await updateDoc(groupRef, { requests: arrayUnion(targetUserId) });
+    alert("Invite sent successfully!");
+  } catch(err) {
     console.error(err);
-    if (err.code === 'permission-denied') {
-      alert('Permission denied while sending invite. Check Firestore rules.');
-    } else {
-      alert('Failed to send invite: ' + (err.message || err));
-    }
+    alert("Failed to send invite: "+(err.message||err));
   }
 };
 </script>
