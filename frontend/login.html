@@ -8,20 +8,24 @@
     body {
       margin: 0;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
-      color: #fff;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      background: radial-gradient(circle at top left, #ff4da6, transparent 40%),
+                  radial-gradient(circle at bottom right, #4d88ff, transparent 40%),
+                  radial-gradient(circle at center, #0d0d0d, #000000 80%);
+      background-color: #0d0d0d;
+      color: #f5f5f5;
       overflow: hidden;
     }
 
     .container {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(20, 20, 30, 0.9);
       padding: 3rem 2.5rem;
       border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2), 0 0 40px rgba(255, 0, 255, 0.15);
+      box-shadow: 0px 0px 20px rgba(255, 105, 180, 0.4),
+                  0px 0px 25px rgba(70, 130, 255, 0.3);
       max-width: 420px;
       width: 100%;
       text-align: center;
@@ -39,49 +43,77 @@
     h1 {
       font-size: 2.2rem;
       margin-bottom: 0.3rem;
-      background: linear-gradient(90deg, #00f5ff, #ff00ff);
+      background: linear-gradient(90deg, #ff66cc, #66a3ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 0 15px rgba(255,255,255,0.2);
     }
 
-    .tagline { font-size: 1rem; margin-bottom: 2rem; color: #ccc; letter-spacing: 1px; }
+    .tagline { 
+      font-size: 1rem; 
+      margin-bottom: 2rem; 
+      color: #ccc; 
+      letter-spacing: 1px; 
+    }
 
     input {
       width: 100%;
       padding: 0.9rem;
       margin: 0.6rem 0;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       font-size: 1rem;
       outline: none;
-      background: rgba(255, 255, 255, 0.85);
-      color: #333;
-      transition: box-shadow 0.3s;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transition: box-shadow 0.3s, background 0.3s;
     }
-    input:focus { box-shadow: 0 0 10px #ff00ff, 0 0 15px #00f5ff; }
+    input::placeholder { color: #aaa; }
+    input:focus { 
+      box-shadow: 0 0 10px #ff66cc, 0 0 15px #66a3ff; 
+      background: rgba(255,255,255,0.2); 
+    }
 
     .btn {
       width: 100%;
-      background: linear-gradient(135deg, #ff6a00, #ee0979);
+      background: linear-gradient(90deg, #ff4da6, #4d88ff);
       color: #fff;
       border: none;
       padding: 0.9rem;
       margin-top: 1rem;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 1rem;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
       font-weight: bold;
       letter-spacing: 1px;
     }
-    .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(238,9,121,0.7); }
+    .btn:hover { 
+      transform: scale(1.05); 
+      background: linear-gradient(90deg, #ff66cc, #66a3ff);
+      box-shadow: 0px 0px 10px rgba(255, 105, 180, 0.6);
+    }
 
-    .toggle-link { margin-top: 1.2rem; display: block; font-size: 0.95rem; color: #ffb3ec; cursor: pointer; text-decoration: none; transition: color 0.2s; }
+    .toggle-link { 
+      margin-top: 1.2rem; 
+      display: block; 
+      font-size: 0.95rem; 
+      color: #ffb3ec; 
+      cursor: pointer; 
+      text-decoration: none; 
+      transition: color 0.2s; 
+    }
     .toggle-link:hover { color: #fff; }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes floatLogo { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(20px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    @keyframes floatLogo { 
+      0% { transform: translateY(0); } 
+      50% { transform: translateY(-10px); } 
+      100% { transform: translateY(0); } 
+    }
   </style>
 </head>
 <body>
