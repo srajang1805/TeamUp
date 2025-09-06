@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      background: radial-gradient(circle at top left, #0d0d0d, #1a1a1a, #0d0d0d);
       color: #fff;
       overflow-x: hidden;
     }
@@ -26,8 +26,8 @@
     .particle {
       position: absolute;
       border-radius: 50%;
-      background: rgba(0, 255, 255, 0.8);
-      animation: float 10s infinite linear;
+      background: rgba(255, 102, 204, 0.6);
+      animation: float 12s infinite linear;
     }
 
     @keyframes float {
@@ -36,9 +36,9 @@
     }
 
     header {
-      background: rgba(0,0,0,0.6);
+      background: rgba(20,20,30,0.95);
       backdrop-filter: blur(6px);
-      box-shadow: 0 2px 10px rgba(0,255,255,0.2);
+      box-shadow: 0 0 15px rgba(255,102,204,0.5), 0 0 15px rgba(70,130,255,0.5);
       padding: 1rem;
       display: flex;
       justify-content: space-between;
@@ -46,13 +46,25 @@
       z-index: 2;
       position: relative;
     }
-    header h1 { margin: 0; font-size: 1.25rem; color: #00e5ff; text-shadow: 0 0 12px #00e5ff; }
+    header h1 { 
+      margin: 0; 
+      font-size: 1.5rem; 
+      background: linear-gradient(90deg, #ff66cc, #66a3ff); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent;
+    }
     nav { display: flex; gap: 0.6rem; }
     nav a {
-      color: #fff; text-decoration: none; padding: 0.35rem 0.6rem; border-radius: 6px;
+      color: #ccc; 
+      text-decoration: none; 
+      padding: 0.35rem 0.6rem; 
+      border-radius: 6px;
       transition: background 0.2s, color 0.2s;
     }
-    nav a:hover { background: #00e5ff; color: #000; }
+    nav a:hover { 
+      background: linear-gradient(90deg, #ff66cc, #66a3ff);
+      color: #000; 
+    }
 
     .container {
       max-width: 900px;
@@ -62,58 +74,91 @@
       z-index: 2;
     }
 
-    h2 { color: #00e5ff; margin-bottom: 1rem; text-align: center; }
+    h2 { 
+      color: #ff66cc; 
+      margin-bottom: 1rem; 
+      text-align: center; 
+      background: linear-gradient(90deg, #ff66cc, #66a3ff);
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent;
+    }
 
     .tabs {
       display: flex;
       justify-content: center;
-      margin-bottom: 1.2rem;
+      margin-bottom: 1.5rem;
       gap: 1rem;
     }
     .tab-btn {
       padding: 0.5rem 1rem;
-      border-radius: 6px;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
-      background: rgba(0,255,255,0.2);
-      color: #fff;
+      background: rgba(255,255,255,0.05);
+      color: #ccc;
       font-weight: bold;
-      transition: background 0.2s, transform 0.15s;
+      transition: all 0.3s;
+      box-shadow: 0 0 8px rgba(255,102,204,0.3), 0 0 6px rgba(70,130,255,0.3);
     }
-    .tab-btn.active { background: #00e5ff; color: #000; }
-    .tab-btn:hover { transform: translateY(-2px); }
+    .tab-btn.active { 
+      background: linear-gradient(90deg, #ff66cc, #66a3ff);
+      color: #000; 
+      box-shadow: 0 0 15px rgba(255,102,204,0.6), 0 0 15px rgba(70,130,255,0.6);
+    }
+    .tab-btn:hover { 
+      transform: translateY(-2px); 
+    }
 
     .card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      padding: 1.2rem;
+      background: rgba(20,20,30,0.95);
+      border-radius: 16px;
+      padding: 1.5rem;
       margin-bottom: 1rem;
-      box-shadow: 0 4px 14px rgba(0,255,255,0.08);
+      box-shadow: 0 0 15px rgba(255,102,204,0.3), 0 0 10px rgba(70,130,255,0.3);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,255,255,0.2); }
+    .card:hover { 
+      transform: translateY(-6px); 
+      box-shadow: 0 0 25px rgba(255,102,204,0.7), 0 0 25px rgba(70,130,255,0.7);
+    }
 
     .btn {
       border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
       cursor: pointer;
-      margin-left: 0.4rem;
-      transition: transform 0.15s, background 0.15s;
+      margin-left: 0.5rem;
+      transition: all 0.25s;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
     }
-    .btn-accept { background: #00e676; color: #000; }
-    .btn-accept:hover { background: #00c853; transform: translateY(-2px); }
-    .btn-reject { background: #ff5252; color: #fff; }
-    .btn-reject:hover { background: #e53935; transform: translateY(-2px); }
+    .btn-accept { 
+      background: linear-gradient(90deg, #00ff99, #00c853); 
+      color: #000; 
+      box-shadow: 0 0 10px #00ff99, 0 0 6px #00c853;
+    }
+    .btn-accept:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 0 18px #00ff99, 0 0 12px #00c853;
+    }
+    .btn-reject { 
+      background: linear-gradient(90deg, #ff5252, #e53935); 
+      color: #fff; 
+      box-shadow: 0 0 10px #ff5252, 0 0 6px #e53935;
+    }
+    .btn-reject:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 0 18px #ff5252, 0 0 12px #e53935;
+    }
 
     footer {
       text-align: center;
       padding: 1rem;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: #aaa;
       z-index: 2;
       position: relative;
@@ -142,13 +187,12 @@
     </div>
 
     <div id="inviteContainer">
-      <!-- Invites will be loaded here -->
+      <!-- Invites loaded here -->
     </div>
   </div>
 
   <footer>© 2025 Team Up</footer>
 
-  <!-- Particles -->
   <script>
     const particlesContainer = document.querySelector('.particles');
     for (let i = 0; i < 40; i++) {
@@ -163,7 +207,6 @@
     }
   </script>
 
-  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
@@ -182,7 +225,6 @@
     const container = document.getElementById("inviteContainer");
     const pendingTab = document.getElementById("pendingTab");
     const sentTab = document.getElementById("sentTab");
-
     let currentUser = null;
 
     onAuthStateChanged(auth, async (user) => {
@@ -191,9 +233,7 @@
       loadPendingInvites();
     });
 
-    function clearContainer() {
-      container.innerHTML = "";
-    }
+    function clearContainer() { container.innerHTML = ""; }
 
     async function loadPendingInvites() {
       clearContainer();
@@ -204,11 +244,7 @@
         where("userId", "==", currentUser.uid), 
         where("status", "==", "pending"));
       const snap = await getDocs(q);
-
-      if (snap.empty) {
-        container.innerHTML = "<p style='text-align:center;color:#ccc;'>No pending invites.</p>";
-        return;
-      }
+      if(snap.empty) return container.innerHTML="<p style='text-align:center;color:#ccc;'>No pending invites.</p>";
 
       snap.forEach(inviteDoc => {
         const invite = inviteDoc.data();
@@ -236,11 +272,7 @@
       const q = query(collection(db, "groupInvites"), 
         where("senderId", "==", currentUser.uid));
       const snap = await getDocs(q);
-
-      if (snap.empty) {
-        container.innerHTML = "<p style='text-align:center;color:#ccc;'>No sent invites.</p>";
-        return;
-      }
+      if(snap.empty) return container.innerHTML="<p style='text-align:center;color:#ccc;'>No sent invites.</p>";
 
       snap.forEach(inviteDoc => {
         const invite = inviteDoc.data();
@@ -272,7 +304,6 @@
     pendingTab.addEventListener("click", loadPendingInvites);
     sentTab.addEventListener("click", loadSentInvites);
 
-    // Logout
     document.getElementById("logoutBtn").addEventListener("click", async (e) => {
       e.preventDefault();
       await signOut(auth);
@@ -281,4 +312,3 @@
   </script>
 </body>
 </html>
-
