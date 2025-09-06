@@ -1,1 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Search Game Teammates - Team Up</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Roboto:wght@400;500&display=swap');
+
+body {
+  margin:0;
+  font-family:'Roboto',sans-serif;
+  background: url('back.jpeg') no-repeat center center fixed;
+  background-size: cover;
+  color:#FF6F00;
+  overflow-x:hidden;
+  position:relative;
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background-color: rgba(255,255,255,0.7);
+  z-index:0;
+}
+
+header {
+  background: rgba(255,111,0,0.85);
+  padding:1rem 2rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 20px rgba(255,111,0,0.2);
+  position:relative;
+  z-index:2;
+}
+header h1 {
+  font-family:'Orbitron',sans-serif;
+  font-size:1.6rem;
+  color:#fff3e0;
+  text-shadow:0 0 10px #FF6F00;
+  margin:0;
+}
+nav { display:flex; gap:1rem; }
+nav a { color:#fff3e0; text-decoration:none; font-weight:500; transition:0.3s; }
+nav a:hover { background:#fff3e0; color:#FF6F00; padding:0.3rem 0.6rem; border-radius:8px; }
+
+.hero { text-align:center; padding:2rem; background: rgba(255,111,0,0.05); border-bottom:1px solid rgba(255,111,0,0.2); position:relative; z-index:1; }
+.hero h2 { font-family:'Orbitron',sans-serif; font-size:2rem; margin-bottom:0.5rem; color:#FF6F00; text-shadow:0 0 10px #FFA726; }
+
+.section-title, .suggested-title {
+  text-align:center;
+  margin:2rem 0 1rem;
+  font-size:1.5rem;
+  font-family:'Orbitron',sans-serif;
+  color:#FF6F00;
+  text-shadow:0 0 10px #FFA726;
+  position:relative;
+  z-index:1;
+}
+.suggested-title { color:#FF8F00; text-shadow:0 0 12px #FFAB40; font-size:1.4rem; }
+
+.container {
+  max-width:1100px;
+  margin:1rem auto;
+  padding:0 1rem;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px,1fr));
+  gap:1.5rem;
+  position:relative;
+  z-index:1;
+}
+
+.card { background: rgba(255,111,0,0.05); border-radius:15px; padding:1.5rem; text-align:left; box-shadow:0 6px 18px rgba(255,111,0,0.15); backdrop-filter:blur(8px); transition:0.3s; position:relative; }
+.card:hover { transform:translateY(-6px); box-shadow:0 10px 28px rgba(255,111,0,0.3); }
+
+.btn { margin-top:12px; padding:10px 18px; border:none; border-radius:10px; background:#FFA726; color:#000; font-weight:500; cursor:pointer; transition:0.3s; }
+.btn:hover { background:#FFB74D; transform:translateY(-2px); }
+
+.tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:6px; }
+.tag { background:#FFA726; color:#000; padding:0.2rem 0.5rem; border-radius:5px; font-size:0.8rem; }
+
+#searchBar { display:block; margin:1rem auto; padding:0.6rem; width:300px; border-radius:8px; border:none; background: rgba(255,111,0,0.2); color:#FF6F00; font-size:1rem; position:relative; z-index:1; }
+
+footer { text-align:center; padding:1.5rem; margin-top:2rem; font-size:0.9rem; color:#FF6F00; text-shadow:0 0 5px #FFA726; background: rgba(255,111,0,0.05); position:relative; z-index:1; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Search Game Teammates</h1>
+  <nav>
+    <a href="dashboard.html">Home</a>
+    <a href="games.html">Game Teams</a>
+    <a href="login.html" id="logoutBtn">Logout</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Find Players for Your Team 🎮</h2>
+  <p>Suggested players have 3+ gaming skills.</p>
+</section>
+
+<input type="text" id="searchBar" placeholder="Search teammates...">
+
+<h3 class="suggested-title">🌟 Suggested Players</h3>
+<section class="container" id="suggestedContainer"></section>
+
+<h3 class="section-title">Other Players</h3>
+<section class="container" id="playersContainer"></section>
+
+<footer>© 2025 Team Up - Online Games</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
+  authDomain: "teamup-8a9f0.firebaseapp.com",
+  projectId: "teamup-8a9f0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const suggestedContainer = document.getElementById('suggestedContainer');
+const playersContainer = document.getElementById('playersContainer');
+const searchBar = document.getElementById('searchBar');
+
+let currentUser = null;
+
+// READ groupId from URL
+const urlParams = new URLSearchParams(window.location.search);
+const groupId = urlParams.get('groupId');
+if(!groupId){ alert("No team selected!"); window.location.href="games.html"; }
+
+// AUTH
+onAuthStateChanged(auth, async user=>{
+  if(!user){ window.location.href='login.html'; return; }
+  currentUser=user;
+  await loadPlayers();
+});
+
+// LOGOUT
+document.getElementById('logoutBtn').addEventListener('click', async ()=>{ await signOut(auth); window.location.href='login.html'; });
+
+// LOAD TEAM & PLAYERS
+async function loadPlayers(){
+  suggestedContainer.innerHTML='<p style="color:#FF6F00">Loading suggested players...</p>';
+  playersContainer.innerHTML='<p style="color:#FF6F00">Loading other players...</p>';
+
+  const groupRef = doc(db,'groups',groupId);
+  const groupSnap = await getDoc(groupRef);
+  if(!groupSnap.exists()){ alert("Team not found!"); window.location.href="games.html"; return; }
+  const group = groupSnap.data();
+
+  const usersSnap = await getDocs(collection(db,'users'));
+  const allUsers = [];
+  usersSnap.forEach(u=>{
+    const data=u.data();
+    if(!group.members.includes(u.id)){
+      allUsers.push({id:u.id, ...data});
+    }
+  });
+
+  allUsers.sort((a,b)=> (b.gameSkills||[]).length - (a.gameSkills||[]).length );
+
+  const suggested = allUsers.filter(u=>(u.gameSkills||[]).length>=3);
+  const others = allUsers.filter(u=>(u.gameSkills||[]).length<3);
+
+  function renderUsers(container, users){
+    container.innerHTML='';
+    users.forEach(u=>{
+      const skills = u.gameSkills||[];
+      const card=document.createElement('div');
+      card.className='card';
+      card.innerHTML=`
+        <h3>${u.name||'Unnamed'}</h3>
+        <p><b>Skills:</b> ${skills.length ? skills.join(', ') : 'None'}</p>
+        <button class="btn" onclick="sendRequest('${u.id}')">Send Request</button>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  renderUsers(suggestedContainer, suggested);
+  renderUsers(playersContainer, others);
+}
+
+// SEND JOIN REQUEST
+window.sendRequest = async (userId)=>{
+  if(!currentUser) return;
+  const groupRef = doc(db,'groups',groupId);
+  const snap = await getDoc(groupRef);
+  const data = snap.data();
+  if(!data.requests) data.requests=[];
+  if(!data.requests.includes(userId)){
+    data.requests.push(userId);
+    await updateDoc(groupRef,{requests:data.requests});
+    alert("Request sent!");
+    await loadPlayers();
+  }
+}
+
+// SEARCH FILTER
+searchBar.addEventListener('input',()=>{
+  const q = searchBar.value.toLowerCase();
+  document.querySelectorAll('#suggestedContainer .card, #playersContainer .card').forEach(card=>{
+    const txt = card.querySelector('h3').innerText.toLowerCase();
+    card.style.display = txt.includes(q)?'block':'none';
+  });
+});
+</script>
+</body>
+</html>
 
