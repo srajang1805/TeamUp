@@ -18,7 +18,6 @@
     overflow-x: hidden;
   }
 
-  /* Faded overlay for readability */
   body::before {
     content: "";
     position: fixed;
@@ -182,7 +181,21 @@
     font-weight: 500;
   }
 
-  /* Modal */
+  .members {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+  }
+  .member {
+    font-size: 0.9rem;
+    margin: 0.2rem 0;
+    color: #ddd;
+  }
+  .member span {
+    color: #ffb3ec;
+  }
+
   #createTeamModal {
     display: none;
     position: fixed;
@@ -233,12 +246,6 @@
     position: relative;
     z-index: 1;
   }
-
-  @media (max-width:600px){
-    .hero h2 { font-size: 2rem; }
-    .card { padding: 1.5rem; }
-    #searchBar, #createTeamBtn { width: 90%; }
-  }
 </style>
 </head>
 <body>
@@ -260,9 +267,7 @@
 <input type="text" id="searchBar" placeholder="Search game teams...">
 <button id="createTeamBtn" class="btn">+ Create New Team</button>
 
-<section class="container" id="teamContainer">
-  <!-- Game team cards dynamically inserted -->
-</section>
+<section class="container" id="teamContainer"></section>
 
 <!-- Create Team Modal -->
 <div id="createTeamModal">
@@ -339,18 +344,34 @@ async function loadTeams(){
   teams = teams.filter(t=>t.tags.some(tag=>['game','gaming','esports'].includes(tag.toLowerCase())));
   teams.sort((a,b)=> b.tags.length - a.tags.length);
   teamContainer.innerHTML='';
-  teams.forEach(t=>{
+
+  for(const t of teams){
     const card=document.createElement('div');
     card.className='card';
+
+    // Get members details
+    let memberHtml = "<div class='members'><strong>Members:</strong><br>";
+    for(const uid of t.members||[]){
+      const uSnap = await getDoc(doc(db,'users',uid));
+      if(uSnap.exists()){
+        const uData = uSnap.data();
+        const skills = (uData.gaming && uData.gaming.length>0) ? uData.gaming.join(", ") : "No gaming skills listed";
+        memberHtml += `<div class="member">${uData.name || uData.username || "Unknown"} <span>(${skills})</span></div>`;
+      }
+    }
+    memberHtml += "</div>";
+
     let btnHtml = t.creatorId===currentUser.uid
       ? `<button class="btn" onclick="window.location.href='searchgame.html?groupId=${encodeURIComponent(t.id)}'">Search Players</button>`
       : `<button class="btn" onclick="requestJoin('${t.id}')">Request to Join</button>`;
+
     card.innerHTML=`<h3>${t.name}</h3>
       <p>${t.description||''}</p>
       <div class="tags">${t.tags.map(tag=>`<span class="tag">${tag}</span>`).join('')}</div>
+      ${memberHtml}
       ${btnHtml}`;
     teamContainer.appendChild(card);
-  });
+  }
 }
 
 window.requestJoin = async (groupId)=>{
@@ -376,4 +397,3 @@ searchBar.addEventListener('input',()=>{
 </script>
 </body>
 </html>
-
