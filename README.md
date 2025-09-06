@@ -1,3 +1,8 @@
+imp instructions
+Save all files in frontend in one folder,open frontpage with live server using vscode.
+
+
+
 # Team Up
 
 **Team Up** is a web platform that helps students and gamers find teammates based on interests, skills, and preferences. It allows users to create profiles, join or form groups, chat in real-time, and rate each other’s reliability in collaborative activities.  
