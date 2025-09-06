@@ -1,1 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Developer Teams - Team Up</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Roboto:wght@400;500&display=swap');
+
+  body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: #000;
+    color: #7FDBFF;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  header {
+    background: rgba(0, 0, 0, 0.85);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,229,255,0.2);
+    position: relative;
+    z-index: 2;
+  }
+  header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    color: #00e5ff;
+    text-shadow: 0 0 12px #00e5ff;
+    margin: 0;
+  }
+  nav {
+    display: flex;
+    gap: 1rem;
+  }
+  nav a {
+    color: #00e5ff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+  }
+  nav a:hover {
+    background: #00e5ff;
+    color: #000;
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(0,229,255,0.05);
+    border-bottom: 1px solid rgba(0,229,255,0.2);
+    position: relative;
+    z-index: 1;
+  }
+  .hero h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #00e5ff;
+    text-shadow: 0 0 12px #00e5ff;
+  }
+
+  .section-title {
+    text-align: center;
+    margin: 2rem 0 1rem;
+    font-size: 1.5rem;
+    font-family: 'Orbitron', sans-serif;
+    color: #00e5ff;
+    text-shadow: 0 0 10px #00e5ff;
+    position: relative;
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 1rem auto;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card {
+    background: rgba(0,229,255,0.05);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: left;
+    box-shadow: 0 6px 18px rgba(0,229,255,0.15);
+    backdrop-filter: blur(8px);
+    transition: 0.3s;
+    position: relative;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 28px rgba(0,229,255,0.3);
+  }
+
+  .btn {
+    margin-top: 12px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    background: #00e5ff;
+    color: #000;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .btn:hover { background: #00bcd4; transform: translateY(-2px); }
+
+  .tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:6px; }
+  .tag { background:#00e5ff; color:#000; padding:0.2rem 0.5rem; border-radius:5px; font-size:0.8rem; }
+
+  input, textarea { width: 100%; margin-top: 6px; padding: 8px; border-radius: 8px; border: 1px solid #00e5ff; background: rgba(0,229,255,0.1); color:#7FDBFF; }
+
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #7FDBFF;
+    text-shadow: 0 0 5px #00e5ff;
+    background: rgba(0, 0, 0, 0.7);
+    position: relative;
+    z-index: 1;
+  }
+
+  #searchBar { display: block; margin: 1rem auto; padding: 0.6rem; width: 300px; border-radius: 8px; border: none; background: rgba(0,229,255,0.2); color: #7FDBFF; font-size:1rem; }
+
+  .message { margin-top: 0.5rem; font-size:0.9rem; color: #7FFF7F; }
+</style>
+</head>
+<body>
+
+<canvas id="matrixCanvas"></canvas>
+
+<header>
+  <h1>Developer Teams</h1>
+  <nav>
+    <a href="dashboard.html">Home</a>
+    <a href="profile.html">Profile</a>
+    <a href="login.html" id="logoutBtn">Logout</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Available Dev Teams 🚀</h2>
+  <p>Join diverse teams based on your skills.</p>
+</section>
+
+<h2 class="section-title">Create a New Team</h2>
+<section class="container">
+  <div class="card">
+    <h3>New Dev Team</h3>
+    <input type="text" id="teamName" placeholder="Team Name">
+    <textarea id="teamDesc" rows="3" placeholder="Team Description"></textarea>
+    <input type="number" id="teamSize" placeholder="Number of People Needed" min="2" max="20">
+    <button class="btn" id="submitTeamBtn">Create Team</button>
+    <div id="statusMsg" class="message"></div>
+  </div>
+</section>
+
+<h2 class="section-title">🔥 Available Dev Teams</h2>
+<input type="text" id="searchBar" placeholder="Search Teams...">
+<section class="container" id="teamContainer"></section>
+
+<footer>© 2025 Developer Teams - Team Up</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
+  authDomain: "teamup-8a9f0.firebaseapp.com",
+  projectId: "teamup-8a9f0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const submitBtn = document.getElementById('submitTeamBtn');
+const teamContainer = document.getElementById('teamContainer');
+const searchBar = document.getElementById('searchBar');
+const statusMsg = document.getElementById('statusMsg');
+
+let currentUser = null;
+
+// MATRIX BACKGROUND
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){canvas.width = window.innerWidth; canvas.height = window.innerHeight;}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/*=".split('');
+const fontSize = 16;
+const columns = Math.floor(canvas.width / fontSize);
+const drops = Array(columns).fill(1);
+function drawMatrix(){
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#00e5ff";
+  ctx.font = fontSize + "px monospace";
+  for(let i=0;i<drops.length;i++){
+    const text = letters[Math.floor(Math.random()*letters.length)];
+    ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+    if(drops[i]*fontSize > canvas.height && Math.random()>0.975) drops[i]=0;
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix,50);
+
+// AUTH & LOGOUT
+onAuthStateChanged(auth, user=>{
+  if(!user) window.location.href='login.html';
+  currentUser = user;
+  if(currentUser) loadTeams();
+});
+document.getElementById('logoutBtn').addEventListener('click',async()=>{await signOut(auth);window.location.href='login.html';});
+
+// CREATE TEAM
+submitBtn.addEventListener('click', async ()=>{
+  const name = document.getElementById('teamName').value.trim();
+  const desc = document.getElementById('teamDesc').value.trim();
+  const size = parseInt(document.getElementById('teamSize').value);
+  if(!name || !desc || !size) {statusMsg.textContent="Fill all fields"; return;}
+
+  // get creator tags
+  const userSnap = await getDoc(doc(db,'users',currentUser.uid));
+  const userTags = userSnap.exists() ? userSnap.data().dev || [] : [];
+  const tags = [...new Set([...userTags,'dev'])];
+
+  try {
+    await addDoc(collection(db,'groups'),{
+      name, description: desc, size,
+      creatorId: currentUser.uid,
+      members: [currentUser.uid],
+      tags,
+      createdAt: serverTimestamp()
+    });
+    statusMsg.textContent = "✅ Team created successfully!";
+    document.getElementById('teamName').value='';
+    document.getElementById('teamDesc').value='';
+    document.getElementById('teamSize').value='';
+    loadTeams();
+  } catch(err) {
+    statusMsg.textContent = "❌ Error creating team: "+err.message;
+  }
+});
+
+// LOAD TEAMS
+async function loadTeams(){
+  teamContainer.innerHTML='';
+  const snap = await getDocs(collection(db,'groups'));
+  let groups = snap.docs.map(d=>({id:d.id,...d.data()}));
+  groups = groups.filter(g=>g.tags.includes('dev'));
+  groups.sort((a,b)=> new Set(b.tags).size - new Set(a.tags).size);
+
+  groups.forEach(g=>{
+    const card = document.createElement('div');
+    card.className='card';
+    let btnHtml='';
+    if(g.creatorId===currentUser.uid){
+      btnHtml=`<button class="btn" onclick="window.location.href='searchdev.html?groupId=${encodeURIComponent(g.id)}'">Search Teammates</button>`;
+    } else {
+      btnHtml=`<button class="btn" onclick="joinTeam('${g.id}')">Request to Join</button>`;
+    }
+    card.innerHTML=`
+      <h3>${g.name}</h3>
+      <p>${g.description}</p>
+      <p><b>Needed:</b> ${g.size || 'N/A'}</p>
+      <div class="tags">${g.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      ${btnHtml}
+    `;
+    teamContainer.appendChild(card);
+  });
+}
+
+// JOIN TEAM
+async function joinTeam(groupId){
+  const groupRef = doc(db,'groups',groupId);
+  const snap = await getDoc(groupRef);
+  if(!snap.exists()) return;
+  const data = snap.data();
+  const members = Array.isArray(data.members)?data.members:[];
+  if(!members.includes(currentUser.uid)){
+    members.push(currentUser.uid);
+    await updateDoc(groupRef,{members});
+    alert('Request sent!');
+    loadTeams();
+  }
+}
+
+// SEARCH FILTER
+searchBar.addEventListener('input',()=>{
+  const q = searchBar.value.toLowerCase();
+  document.querySelectorAll('#teamContainer .card').forEach(card=>{
+    const txt = card.querySelector('h3').innerText.toLowerCase();
+    card.style.display = txt.includes(q)?'block':'none';
+  });
+});
+</script>
+</body>
+</html>
 
