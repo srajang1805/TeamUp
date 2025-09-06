@@ -1,372 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Team Up Dashboard</title>
-<style>
-  body {
-    margin: 0;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background: radial-gradient(circle at top left, #ff4da6, transparent 40%),
-                radial-gradient(circle at bottom right, #4d88ff, transparent 40%),
-                radial-gradient(circle at center, #0d0d0d, #000 80%);
-    color: #f5f5f5;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login / Signup - Team UP</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top left, #ff4da6, transparent 40%),
+                  radial-gradient(circle at bottom right, #4d88ff, transparent 40%),
+                  radial-gradient(circle at center, #0d0d0d, #000000 80%);
+      background-color: #0d0d0d;
+      color: #f5f5f5;
+      overflow: hidden;
+    }
 
-  header {
-    background: rgba(20, 20, 30, 0.9);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding: 1rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    box-shadow: 0 0 12px rgba(255,105,180,0.3);
-  }
+    .container {
+      background: rgba(20, 20, 30, 0.9);
+      padding: 3rem 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0px 0px 20px rgba(255, 105, 180, 0.4),
+                  0px 0px 25px rgba(70, 130, 255, 0.3);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      animation: fadeIn 1s ease;
+    }
 
-  header h1 {
-    margin: 0;
-    font-size: 1.6rem;
-    background: linear-gradient(90deg, #ff66cc, #66a3ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 700;
-  }
+    .logo {
+      width: 160px;
+      margin-bottom: 1rem;
+      animation: floatLogo 3s ease-in-out infinite;
+      border-radius: 12px;
+    }
 
-  nav a {
-    text-decoration: none;
-    color: #ccc;
-    margin-left: 1rem;
-    padding: 0.4rem 0.75rem;
-    border-radius: 8px;
-    transition: 0.3s;
-  }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.3rem;
+      background: linear-gradient(90deg, #ff66cc, #66a3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
 
-  nav a:hover {
-    color: #000;
-    background: linear-gradient(90deg, #ff66cc, #66a3ff);
-  }
+    .tagline { 
+      font-size: 1rem; 
+      margin-bottom: 2rem; 
+      color: #ccc; 
+      letter-spacing: 1px; 
+    }
 
-  .hero {
-    text-align: center;
-    padding: 2rem 1rem;
-  }
+    input {
+      width: 100%;
+      padding: 0.9rem;
+      margin: 0.6rem 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transition: box-shadow 0.3s, background 0.3s;
+    }
+    input::placeholder { color: #aaa; }
+    input:focus { 
+      box-shadow: 0 0 10px #ff66cc, 0 0 15px #66a3ff; 
+      background: rgba(255,255,255,0.2); 
+    }
 
-  .hero h2 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    background: linear-gradient(90deg, #ff66cc, #66a3ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+    .btn {
+      width: 100%;
+      background: linear-gradient(90deg, #ff4da6, #4d88ff);
+      color: #fff;
+      border: none;
+      padding: 0.9rem;
+      margin-top: 1rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .btn:hover { 
+      transform: scale(1.05); 
+      background: linear-gradient(90deg, #ff66cc, #66a3ff);
+      box-shadow: 0px 0px 10px rgba(255, 105, 180, 0.6);
+    }
 
-  .hero p {
-    font-size: 1.15rem;
-    max-width: 750px;
-    margin: 0 auto 1.5rem;
-    color: #ccc;
-    line-height: 1.7;
-  }
+    .toggle-link { 
+      margin-top: 1.2rem; 
+      display: block; 
+      font-size: 0.95rem; 
+      color: #ffb3ec; 
+      cursor: pointer; 
+      text-decoration: none; 
+      transition: color 0.2s; 
+    }
+    .toggle-link:hover { color: #fff; }
 
-  .main-content {
-    display: flex;
-    gap: 1.25rem;
-    max-width: 1200px;
-    margin: 0 auto 2rem auto;
-    padding: 0 1rem;
-  }
-
-  .left, .right {
-    width: 240px;
-    background: rgba(20,20,30,0.9);
-    border-radius: 14px;
-    padding: 1rem;
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 0 20px rgba(70,130,255,0.25), 0 0 16px rgba(255,105,180,0.2);
-    overflow-y: auto;
-    max-height: 650px;
-  }
-
-  .center {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .card {
-    background: rgba(20, 20, 30, 0.9);
-    border-radius: 18px;
-    padding: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 20px rgba(70,130,255,0.25), 0 0 16px rgba(255,105,180,0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 0 25px rgba(255, 102, 204, 0.4), 0 0 20px rgba(102, 163, 255, 0.4);
-  }
-
-  .card h3 {
-    margin-top: 0;
-    font-size: 1.4rem;
-    font-weight: 600;
-    background: linear-gradient(90deg, #ff66cc, #66a3ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 0.5rem;
-  }
-
-  .card p {
-    color: #ccc;
-    font-size: 1rem;
-    line-height: 1.6;
-  }
-
-  .btn {
-    background: linear-gradient(90deg, #ff4da6, #4d88ff);
-    color: #fff;
-    border: none;
-    padding: 0.8rem 1.8rem;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 0.8rem;
-    transition: all 0.3s ease;
-  }
-
-  .btn:hover {
-    background: linear-gradient(90deg, #ff66cc, #66a3ff);
-    box-shadow: 0 0 12px rgba(255,105,180,0.5), 0 0 12px rgba(70,130,255,0.5);
-    transform: translateY(-2px);
-  }
-
-  h4 {
-    color: #ff66cc;
-    margin-bottom: 0.75rem;
-    font-size: 1.15rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 0.25rem;
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  li {
-    margin-bottom: 0.5rem;
-    padding: 0.8rem 0.8rem;
-    border-radius: 12px;
-    cursor: pointer;
-    background: rgba(255,255,255,0.05);
-    color: #ccc;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 6px rgba(255,105,180,0.2), 0 0 4px rgba(70,130,255,0.2);
-    display: flex;
-    flex-direction: column;
-  }
-
-  li:hover {
-    background: linear-gradient(90deg, #ff66cc, #66a3ff);
-    color: #000;
-    box-shadow: 0 0 12px rgba(255,105,180,0.5), 0 0 12px rgba(70,130,255,0.5);
-    transform: translateX(3px);
-  }
-
-  .li-title {
-    font-weight: 700;
-  }
-
-  .li-msg {
-    font-size: 0.9rem;
-    color: #ddd;
-    margin-top: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .li-meta {
-    font-size: 0.75rem;
-    color: #aaa;
-    margin-top: 2px;
-    text-align: right;
-  }
-
-  .left::-webkit-scrollbar, .right::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  .left::-webkit-scrollbar-thumb, .right::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #ff66cc, #66a3ff);
-    border-radius: 8px;
-  }
-
-  .left::-webkit-scrollbar-track, .right::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.1);
-  }
-
-  @media (max-width: 900px) {
-    .main-content { flex-direction: column; }
-    .left, .right { width: 100%; max-height: 300px; }
-  }
-
-  footer {
-    text-align: center;
-    padding: 2rem;
-    font-size: 0.95rem;
-    color: #aaa;
-    margin-top: auto;
-  }
-</style>
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(20px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    @keyframes floatLogo { 
+      0% { transform: translateY(0); } 
+      50% { transform: translateY(-10px); } 
+      100% { transform: translateY(0); } 
+    }
+  </style>
 </head>
-
 <body>
-<header>
-  <h1>Team Up</h1>
-  <nav>
-    <a href="dashboard.html">Home</a>
-    <a href="invite.html">Invites</a>
-    <a href="chat.html">Chats</a>
-    <a href="mygroups.html">My Groups</a>
-    <a href="profile.html">Profile</a>
-    <a href="#" id="logoutBtn">Logout</a>
-  </nav>
-</header>
+  <div class="container">
+    <img src="logo.jpeg" alt="Team UP Logo" class="logo">
+    <h1>TEAM UP</h1>
+    <p class="tagline">Connect • Create • Compete 🚀</p>
 
-<section class="hero">
-  <h2 id="welcomeUser">Welcome!</h2>
-  <p id="heroText">Collaborate, compete, and grow with like-minded people. Find your teams, games, or study groups and start connecting today.</p>
-</section>
-
-<section class="main-content">
-  <!-- Left Panel: Recent Chats -->
-  <div class="left">
-    <h4>Recent Chats</h4>
-    <ul id="recentChats">
-      <li>Loading...</li>
-    </ul>
+    <h2 id="form-title">Login</h2>
+    <form id="auth-form">
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <div id="extra-fields" style="display: none;">
+        <input type="text" id="fullname" placeholder="Full Name">
+        <input type="text" id="username" placeholder="Username">
+      </div>
+      <button type="submit" class="btn">Submit</button>
+    </form>
+    <a class="toggle-link" onclick="toggleForm()">Don’t have an account? Sign up</a>
   </div>
 
-  <!-- Center Panel: Dev/Games/Study -->
-  <div class="center">
-    <div class="card">
-      <h3>Development</h3>
-      <p>Join hackathons, collaborate on coding projects, and enhance your skills with dev teams.</p>
-      <button class="btn" onclick="location.href='devl.html'">Explore</button>
-    </div>
-    <div class="card">
-      <h3>Online Games</h3>
-      <p>Find teammates for PUBG, COD, Valorant, and more. Never play solo again.</p>
-      <button class="btn" onclick="location.href='game.html'">Find Squad</button>
-    </div>
-    <div class="card">
-      <h3>Study Groups</h3>
-      <p>Stay motivated by joining study groups for College, JEE, or UPSC. Learn and grow together.</p>
-      <button class="btn" onclick="location.href='studygroup.html'">Join Group</button>
-    </div>
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  <!-- Right Panel: My Groups -->
-  <div class="right">
-    <h4>My Groups</h4>
-    <ul id="myGroups">
-      <li>Loading...</li>
-    </ul>
-  </div>
-</section>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
+      authDomain: "teamup-8a9f0.firebaseapp.com",
+      projectId: "teamup-8a9f0",
+      storageBucket: "teamup-8a9f0.firebasestorage.app",
+      messagingSenderId: "348128513327",
+      appId: "1:348128513327:web:577cc99147e834d0b0e5da",
+      measurementId: "G-HQR07FJ6ZT"
+    };
 
-<footer>© 2025 Team Up. Built for thriving communities.</footer>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    const form = document.getElementById('auth-form');
+    const formTitle = document.getElementById('form-title');
+    const extraFields = document.getElementById('extra-fields');
+    const toggleLink = document.querySelector('.toggle-link');
+    let isSignup = false;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
-  authDomain: "teamup-8a9f0.firebaseapp.com",
-  projectId: "teamup-8a9f0"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-const welcomeUser = document.getElementById("welcomeUser");
-const recentChatsList = document.getElementById("recentChats");
-const myGroupsList = document.getElementById("myGroups");
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = "login.html"; return; }
-  welcomeUser.textContent = `Welcome, ${user.displayName || 'User'}!`;
-
-  loadRecentChats(user.uid);
-  loadMyGroups(user.uid);
-});
-
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await signOut(auth);
-  window.location.href = "login.html";
-});
-
-// --- Load recent chats ---
-async function loadRecentChats(uid) {
-  const groupsCol = collection(db, "groups");
-  onSnapshot(groupsCol, async snapshot => {
-    recentChatsList.innerHTML = "";
-    for (const gDoc of snapshot.docs) {
-      const gData = gDoc.data();
-      if (!gData.members.includes(uid)) continue;
-
-      const chatCol = collection(db, "groups", gDoc.id, "chat");
-      const lastMsgQuery = query(chatCol, orderBy("timestamp","desc"), limit(1));
-      const lastMsgSnap = await getDocs(lastMsgQuery);
-      let lastMsg = lastMsgSnap.docs[0]?.data();
-      let senderName = "Unknown";
-      if(lastMsg){
-        const userDoc = await getDoc(doc(db,"users", lastMsg.sender));
-        senderName = userDoc.exists() ? userDoc.data().name : "Unknown";
+    function toggleForm() {
+      isSignup = !isSignup;
+      if (isSignup) {
+        formTitle.innerText = "Sign Up";
+        extraFields.style.display = "block";
+        toggleLink.innerText = "Already have an account? Login";
+      } else {
+        formTitle.innerText = "Login";
+        extraFields.style.display = "none";
+        toggleLink.innerText = "Don’t have an account? Sign up";
       }
-
-      const li = document.createElement("li");
-      li.innerHTML = `<div class="li-title">${gData.name}</div>
-                      <div class="li-msg">${lastMsg ? lastMsg.text : 'No messages yet'}</div>
-                      <div class="li-meta">${lastMsg ? senderName + " | " + (lastMsg.timestamp?.toDate().toLocaleTimeString() || '') : ''}</div>`;
-      li.onclick = () => window.location.href=`chat.html?groupId=${gDoc.id}`;
-      recentChatsList.appendChild(li);
     }
-    if(!recentChatsList.children.length) recentChatsList.innerHTML="<li>No recent chats</li>";
-  });
-}
+    window.toggleForm = toggleForm;
 
-// --- Load my groups ---
-async function loadMyGroups(uid){
-  const groupsCol = collection(db,"groups");
-  onSnapshot(groupsCol, async snapshot=>{
-    myGroupsList.innerHTML="";
-    for(const gDoc of snapshot.docs){
-      const gData=gDoc.data();
-      if(!gData.members.includes(uid)) continue;
-      const li = document.createElement("li");
-      li.textContent = gData.name;
-      li.onclick = ()=>window.location.href=`chat.html?groupId=${gDoc.id}`;
-      myGroupsList.appendChild(li);
-    }
-    if(!myGroupsList.children.length) myGroupsList.innerHTML="<li>No groups</li>";
-  });
-}
-</script>
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
 
+      if (isSignup) {
+        const fullName = document.getElementById('fullname').value.trim();
+        const username = document.getElementById('username').value.trim();
+
+        if (!fullName || !username) {
+          alert("Please enter both full name and username.");
+          return;
+        }
+
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          await updateProfile(user, { displayName: fullName });
+
+          await setDoc(doc(db, "users", user.uid), {
+            name: fullName,
+            username: username,
+            email: email,
+            study: [],
+            gaming: [],
+            dev: []
+          });
+
+          alert("Signup successful!");
+          window.location.href = "dashboard.html";
+        } catch (error) {
+          alert(error.message);
+        }
+
+      } else {
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          alert("Login successful!");
+          window.location.href = "dashboard.html";
+        } catch (error) {
+          alert(error.message);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
