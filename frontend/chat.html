@@ -1,1 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Team Up - Chat</title>
+<style>
+  @keyframes bgMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(-45deg, #1a0033, #2a004d, #0d001a, #000);
+    background-size: 400% 400%;
+    animation: bgMove 20s ease infinite;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  header {
+    background: rgba(0,0,0,0.6);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-shadow: 0 0 6px #a855f7;
+    backdrop-filter: blur(6px);
+  }
+  .nav-links { display: flex; gap: 1rem; }
+  .nav-links a {
+    color: #fff; text-decoration: none; font-weight: bold;
+    padding: 0.25rem 0.5rem; border-radius: 6px; transition: 0.2s;
+  }
+  .nav-links a:hover { background: #a855f7; color: #000; }
+  .main-container {
+    flex: 1; display: flex; max-width: 1200px;
+    margin: 0 auto; width: 100%; overflow: hidden;
+  }
+  .sidebar {
+    width: 220px; background: rgba(0,0,0,0.4);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    padding: 1rem; display: none; flex-direction: column; overflow-y: auto;
+  }
+  .sidebar h3 { margin: 0 0 0.5rem; font-size: 1rem; color: #a855f7; }
+  .member { padding: 0.5rem; border-radius: 6px; background: rgba(168,85,247,0.15); margin-bottom: 0.25rem; }
+  .chat-container {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 1rem; gap: 0.5rem; overflow: hidden;
+  }
+  #groupsList, #messages {
+    flex: 1; overflow-y: auto; padding: 0.5rem;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .group-item {
+    padding: 0.75rem; border-radius: 8px;
+    background: rgba(255,255,255,0.08);
+    cursor: pointer; transition: 0.2s;
+  }
+  .group-item:hover { background: #a855f7; color: #000; }
+  @keyframes bubbleMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .message {
+    max-width: 70%; padding: 0.6rem 0.9rem;
+    border-radius: 14px; word-wrap: break-word; line-height: 1.3;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    background-size: 200% 200%; animation: bubbleMove 10s ease infinite;
+  }
+  .message.self {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #d8b4fe, #a855f7, #7e22ce);
+    color: #000; border-bottom-right-radius: 0;
+  }
+  .message.other {
+    align-self: flex-start;
+    background: linear-gradient(135deg, #3b1a5e, #2a0a3d, #1a0826);
+    color: #fff; border-bottom-left-radius: 0;
+  }
+  .msg-meta { font-size: 0.75rem; color: #ddd; margin-top: 2px; text-align: right; }
+  .input-container { display: flex; gap: 0.5rem; padding: 0.5rem 0; }
+  #msgInput {
+    flex: 1; padding: 0.5rem; border-radius: 8px;
+    border: none; font-size: 1rem;
+  }
+  #sendBtn {
+    background: linear-gradient(135deg, #c084fc, #a855f7, #7e22ce);
+    background-size: 200% 200%; animation: bubbleMove 6s ease infinite;
+    color: #000; border: none; padding: 0.5rem 1rem;
+    border-radius: 8px; cursor: pointer; font-weight: bold;
+    transition: 0.2s;
+  }
+  #sendBtn:hover {
+    background: linear-gradient(135deg, #a855f7, #7e22ce, #6d28d9);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div id="groupName">Team Up</div>
+  <div class="nav-links">
+    <a href="dashboard.html">Home</a>
+    <a href="mygroups.html">My Groups</a>
+  </div>
+</header>
+
+<div class="main-container">
+  <div class="sidebar" id="membersSidebar">
+    <h3>Members</h3>
+    <div id="membersList"></div>
+  </div>
+
+  <div class="chat-container">
+    <div id="groupsList"></div>
+    <div id="messages" style="display:none;"></div>
+    <div class="input-container" id="inputContainer" style="display:none;">
+      <input type="text" id="msgInput" placeholder="Type a message..." />
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import {
+  getFirestore, collection, query, orderBy, onSnapshot,
+  addDoc, serverTimestamp, doc, getDoc, getDocs
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
+  authDomain: "teamup-8a9f0.firebaseapp.com",
+  projectId: "teamup-8a9f0"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const groupId = new URLSearchParams(window.location.search).get("groupId");
+const groupNameEl = document.getElementById("groupName");
+const groupsList = document.getElementById("groupsList");
+const messagesDiv = document.getElementById("messages");
+const inputContainer = document.getElementById("inputContainer");
+const msgInput = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+const membersSidebar = document.getElementById("membersSidebar");
+const membersList = document.getElementById("membersList");
+
+let currentUser = null;
+const userCache = new Map();
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+  currentUser = user;
+
+  if (groupId) {
+    loadGroupChat(groupId);
+  } else {
+    loadActiveGroups();
+  }
+});
+
+async function loadActiveGroups() {
+  groupNameEl.textContent = "My Groups";
+  groupsList.style.display = "flex";
+  messagesDiv.style.display = "none";
+  inputContainer.style.display = "none";
+  membersSidebar.style.display = "none";
+
+  const groupsSnap = await getDocs(collection(db, "groups"));
+  groupsList.innerHTML = "";
+
+  let hasGroups = false;
+  groupsSnap.forEach(g => {
+    const data = g.data();
+    if (data.members && data.members.includes(currentUser.uid)) {
+      hasGroups = true;
+      const div = document.createElement("div");
+      div.className = "group-item";
+      div.textContent = data.name;
+      div.onclick = () => { window.location.href = `chat.html?groupId=${g.id}`; };
+      groupsList.appendChild(div);
+    }
+  });
+
+  if (!hasGroups) {
+    groupsList.innerHTML = "<p style='color:#fff3e0'>You are not part of any groups yet.</p>";
+  }
+}
+
+async function loadGroupChat(id) {
+  const groupRef = doc(db, "groups", id);
+  const groupSnap = await getDoc(groupRef);
+  if (!groupSnap.exists() || !groupSnap.data().members.includes(currentUser.uid)) {
+    alert("You are not a member of this group!");
+    window.location.href = "chat.html";
+    return;
+  }
+
+  groupNameEl.textContent = groupSnap.data().name;
+  groupsList.style.display = "none";
+  messagesDiv.style.display = "flex";
+  inputContainer.style.display = "flex";
+  membersSidebar.style.display = "flex";
+
+  // Load members
+  membersList.innerHTML = "";
+  const members = groupSnap.data().members || [];
+  for (const uid of members) {
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
+    const div = document.createElement("div");
+    div.className = "member";
+    div.textContent = userSnap.exists() ? userSnap.data().name : "Unknown";
+    membersList.appendChild(div);
+  }
+
+  // Load chat messages
+  const chatRef = collection(db, "groups", id, "chat");
+  const q = query(chatRef, orderBy("timestamp"));
+  onSnapshot(q, async (snapshot) => {
+    messagesDiv.innerHTML = "";
+    const senderIds = new Set(snapshot.docs.map(d => d.data().sender));
+    for (const uid of senderIds) {
+      if (!userCache.has(uid)) {
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        userCache.set(uid, userSnap.exists() ? userSnap.data().name : "Unknown");
+      }
+    }
+    snapshot.docs.forEach(d => {
+      const msg = d.data();
+      const senderName = userCache.get(msg.sender) || "Unknown";
+      const time = msg.timestamp?.toDate ? msg.timestamp.toDate().toLocaleTimeString() : "";
+      const div = document.createElement("div");
+      div.className = `message ${msg.sender === currentUser.uid ? "self" : "other"}`;
+      div.innerHTML = `<strong>${senderName}:</strong> ${msg.text}<div class="msg-meta">${time}</div>`;
+      messagesDiv.appendChild(div);
+    });
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  });
+
+  sendBtn.onclick = async () => {
+    const text = msgInput.value.trim();
+    if (!text) return;
+    await addDoc(collection(db, "groups", id, "chat"), {
+      sender: currentUser.uid,
+      text,
+      timestamp: serverTimestamp()
+    });
+    msgInput.value = "";
+  };
+
+  msgInput.addEventListener("keypress", e => {
+    if (e.key === "Enter") sendBtn.click();
+  });
+}
+</script>
+</body>
+</html>
 
