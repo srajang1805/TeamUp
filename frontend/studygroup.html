@@ -5,14 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Study Groups - Team Up</title>
 <style>
+  :root {
+    --bg-gradient-light: linear-gradient(135deg, #ffe6f0 0%, #e6f0ff 100%);
+    --bg-gradient-dark: linear-gradient(135deg, #0d0d2b 0%, #000 100%);
+    --card-bg-light: rgba(255,255,255,0.85);
+    --card-bg-dark: rgba(20,20,40,0.85);
+    --text-light: #222;
+    --text-dark: #eee;
+    --header-bg-light: rgba(255,255,255,0.85);
+    --header-bg-dark: rgba(0,0,0,0.6);
+    --footer-bg-light: rgba(255,255,255,0.7);
+    --footer-bg-dark: rgba(0,0,0,0.6);
+  }
   body {
     margin: 0;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #ffe6f0 0%, #e6f0ff 100%);
-    color: #222;
+    background: var(--bg-gradient-light);
+    color: var(--text-light);
+    transition: background 0.4s, color 0.4s;
+  }
+  body.dark {
+    background: var(--bg-gradient-dark);
+    color: var(--text-dark);
   }
   header {
-    background: rgba(255,255,255,0.85);
+    background: var(--header-bg-light);
     backdrop-filter: blur(8px);
     padding: 1rem 2rem;
     display: flex;
@@ -20,7 +37,9 @@
     align-items: center;
     flex-wrap: wrap;
     box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    transition: background 0.4s;
   }
+  body.dark header { background: var(--header-bg-dark); }
   header h1 {
     font-size: 1.6rem;
     font-weight: 600;
@@ -38,7 +57,7 @@
   }
   nav a {
     text-decoration: none;
-    color: #333;
+    color: inherit;
     font-weight: 500;
     transition: 0.3s;
   }
@@ -55,8 +74,18 @@
     border-image: linear-gradient(90deg, #ff8fcf, #6fa8ff) 1;
     color: #222;
   }
+  body.dark .search-bar {
+    background: #222;
+    color: #eee;
+  }
   .search-bar:focus { box-shadow: 0px 0px 10px rgba(111,168,255,0.5); }
-  .hero { text-align: center; padding: 3rem 2rem; background: rgba(255,255,255,0.6); }
+  .hero {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(255,255,255,0.6);
+    transition: background 0.4s;
+  }
+  body.dark .hero { background: rgba(0,0,0,0.4); }
   .hero h2 {
     font-size: 2rem;
     font-weight: 600;
@@ -83,13 +112,14 @@
     gap: 1.8rem;
   }
   .card {
-    background: rgba(255,255,255,0.85);
+    background: var(--card-bg-light);
     border-radius: 16px;
     padding: 1.5rem;
     text-align: center;
     box-shadow: 0px 6px 18px rgba(0,0,0,0.08);
-    transition: 0.3s ease;
+    transition: transform 0.3s, background 0.4s;
   }
+  body.dark .card { background: var(--card-bg-dark); }
   .card:hover { transform: translateY(-6px); box-shadow: 0px 8px 22px rgba(0,0,0,0.15); }
   .card h3 {
     margin: 0 0 0.5rem;
@@ -98,6 +128,14 @@
     background: linear-gradient(90deg, #ff8fcf, #6fa8ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+  .card input, .card textarea, .card select {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
   }
   .btn {
     margin-top: 12px;
@@ -111,12 +149,29 @@
     transition: 0.3s;
   }
   .btn:hover { opacity: 0.9; }
-  footer { text-align: center; padding: 1rem; background: rgba(255,255,255,0.7); margin-top: 2rem; font-size: 0.9rem; color: #555; }
-  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 1000; }
-  .modal-content { background: #fff; padding: 20px; border-radius: 12px; text-align: center; width: 320px; }
-  .modal-content input, .modal-content textarea, .modal-content select {
-    width: 100%; margin-top: 10px; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 0.9rem;
+  footer {
+    text-align: center;
+    padding: 1rem;
+    background: var(--footer-bg-light);
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #555;
+    transition: background 0.4s, color 0.4s;
   }
+  body.dark footer {
+    background: var(--footer-bg-dark);
+    color: #ccc;
+  }
+  /* Theme toggle */
+  .theme-toggle {
+    cursor: pointer;
+    font-size: 1.2rem;
+    border: none;
+    background: none;
+    color: inherit;
+    transition: transform 0.3s;
+  }
+  .theme-toggle:hover { transform: rotate(20deg); }
 </style>
 </head>
 <body>
@@ -127,7 +182,7 @@
     <a href="dashboard.html">Home</a>
     <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search groups...">
     <a href="#">Profile</a>
-    <a href="#" id="createGroupBtn">Create Group</a>
+    <button id="themeToggle" class="theme-toggle">🌙</button>
     <a href="login.html" id="logoutBtn">Logout</a>
   </nav>
 </header>
@@ -138,13 +193,9 @@
 </section>
 
 <h2 class="section-title">🔥 Recommended for You</h2>
-<section class="container" id="groupContainer"></section>
-
-<footer>© 2025 Study Groups - Team Up. Built for learners like you 💡</footer>
-
-<!-- Create Group Modal -->
-<div class="modal" id="groupModal">
-  <div class="modal-content">
+<section class="container" id="groupContainer">
+  <!-- Create Group Card -->
+  <div class="card" id="createGroupCard">
     <h3>Create New Group</h3>
     <input type="text" id="groupName" placeholder="Group Name">
     <textarea id="groupDesc" rows="3" placeholder="Description"></textarea>
@@ -157,9 +208,11 @@
       <option value="Web">Web</option>
       <option value="Mobile">Mobile</option>
     </select>
-    <button class="btn" id="submitGroup">Create</button>
+    <button class="btn" id="submitGroup">Create Group</button>
   </div>
-</div>
+</section>
+
+<footer>© 2025 Study Groups - Team Up. Built for learners like you 💡</footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -181,65 +234,81 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const groupContainer = document.getElementById("groupContainer");
-const groupModal = document.getElementById("groupModal");
-const createGroupBtn = document.getElementById("createGroupBtn");
 const submitGroupBtn = document.getElementById("submitGroup");
 const searchInput = document.getElementById("searchInput");
+const themeToggle = document.getElementById("themeToggle");
 
 let currentUser = null;
 
+// Theme persistence
+function applyTheme(theme) {
+  document.body.classList.toggle("dark", theme === "dark");
+  themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+}
+const savedTheme = localStorage.getItem("theme") || "light";
+applyTheme(savedTheme);
+
+themeToggle.addEventListener("click", () => {
+  const newTheme = document.body.classList.contains("dark") ? "light" : "dark";
+  applyTheme(newTheme);
+  localStorage.setItem("theme", newTheme);
+});
+
+// Auth listener
 onAuthStateChanged(auth, async user => {
   if (!user) return window.location.href = "login.html";
   currentUser = user;
   await loadGroups();
 });
 
+// Logout
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "login.html";
 });
 
-// Show modal
-createGroupBtn.addEventListener("click", () => groupModal.style.display = "flex");
-
-// Close modal when clicking outside
-window.onclick = e => { if (e.target === groupModal) groupModal.style.display = "none"; };
-
-// Create group
+// Create Group
 submitGroupBtn.addEventListener("click", async () => {
   const name = document.getElementById("groupName").value.trim();
   const desc = document.getElementById("groupDesc").value.trim();
   const tags = Array.from(document.getElementById("groupTags").selectedOptions).map(o => o.value);
 
-  if (!name || !desc || tags.length === 0) {
-    alert("Please fill all fields and select at least one tag.");
-    return;
+  if (!name || !desc || tags.length === 0) return alert("Please fill all fields and select at least one tag.");
+
+  try {
+    await addDoc(collection(db, "groups"), {
+      name,
+      description: desc,
+      tags,
+      members: [currentUser.uid],
+      createdAt: new Date()
+    });
+
+    document.getElementById("groupName").value = "";
+    document.getElementById("groupDesc").value = "";
+    Array.from(document.getElementById("groupTags").options).forEach(o => o.selected = false);
+
+    await loadGroups();
+  } catch(err) {
+    console.error(err);
+    alert("Error creating group.");
   }
-
-  await addDoc(collection(db, "groups"), {
-    name, description: desc, tags, members: []
-  });
-
-  groupModal.style.display = "none";
-  document.getElementById("groupName").value = "";
-  document.getElementById("groupDesc").value = "";
-  Array.from(document.getElementById("groupTags").options).forEach(opt => opt.selected = false);
-
-  await loadGroups();
 });
 
-// Load groups
+// Load Groups
 async function loadGroups() {
+  const cards = groupContainer.querySelectorAll(".card");
+  const createCard = cards[0];
   groupContainer.innerHTML = "";
+  if (createCard) groupContainer.appendChild(createCard);
+
   const snap = await getDocs(collection(db, "groups"));
   const groups = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  // Get user data
   const userSnap = await getDoc(doc(db, "users", currentUser.uid));
   const userData = userSnap.exists() ? userSnap.data() : {};
   const userTags = userData.study || [];
 
-  // Sort by tag similarity
   groups.sort((a, b) => {
     const simA = (a.tags || []).filter(t => userTags.includes(t)).length;
     const simB = (b.tags || []).filter(t => userTags.includes(t)).length;
@@ -260,32 +329,35 @@ async function loadGroups() {
     groupContainer.appendChild(card);
   });
 
-  // Add join handlers
   document.querySelectorAll(".join-btn").forEach(btn => {
-    btn.addEventListener("click", () => joinGroup(btn.dataset.id));
+    btn.addEventListener("click", () => joinGroup(btn.dataset.id, btn));
   });
 }
 
-// Join group
-async function joinGroup(groupId) {
+// Join Group
+async function joinGroup(groupId, btn) {
+  btn.disabled = true;
+  btn.innerText = "Joining...";
   const groupRef = doc(db, "groups", groupId);
   const groupSnap = await getDoc(groupRef);
   if (!groupSnap.exists()) return;
 
   const data = groupSnap.data();
-  let members = data.members || [];
+  let members = Array.isArray(data.members) ? data.members : [];
+
   if (!members.includes(currentUser.uid)) {
     members.push(currentUser.uid);
     await updateDoc(groupRef, { members });
   }
 
-  window.location.href = `searchTeammates.html?groupId=${groupId}`;
+  window.location.href = `searchTeammates.html?groupId=${encodeURIComponent(groupId)}`;
 }
 
-// Search filter
+// Search Filter
 searchInput.addEventListener("input", () => {
   const query = searchInput.value.toLowerCase();
   document.querySelectorAll(".card").forEach(card => {
+    if (card.id === "createGroupCard") return;
     const title = card.querySelector("h3").innerText.toLowerCase();
     card.style.display = title.includes(query) ? "block" : "none";
   });
@@ -294,4 +366,3 @@ searchInput.addEventListener("input", () => {
 
 </body>
 </html>
-
