@@ -6,21 +6,26 @@
 <title>Invites - Team Up</title>
 <style>
 body { margin:0; font-family:"Segoe UI",sans-serif; background:#0d0d0d; color:#fff; overflow-x:hidden; }
-header{background:rgba(20,20,30,0.95); padding:1rem; display:flex; justify-content:space-between;}
-header h1{margin:0;background:linear-gradient(90deg,#ff66cc,#66a3ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-nav a{color:#ccc;text-decoration:none;margin-left:1rem;}
-nav a:hover{color:#00e5ff;}
-.container{max-width:900px;margin:2rem auto;padding:1rem;}
-.tabs{display:flex;justify-content:center;gap:1rem;margin-bottom:1rem;}
-.tab-btn{padding:0.5rem 1rem;border:none;border-radius:8px;cursor:pointer;background:rgba(255,255,255,0.05);color:#ccc;font-weight:bold;}
-.tab-btn.active{background:#00e5ff;color:#000;}
-.card{background:rgba(20,20,30,0.95);border-radius:12px;padding:1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
-.btn{border:none;padding:0.5rem 1rem;border-radius:10px;cursor:pointer;margin-left:0.5rem;}
-.btn-accept{background:#00ff99;color:#000;}
-.btn-reject{background:#ff5252;color:#fff;}
+header { background: rgba(20,20,30,0.95); padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 20px rgba(0,229,255,0.2); }
+header h1 { margin:0; background:linear-gradient(90deg,#ff66cc,#66a3ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-family:'Orbitron',sans-serif; }
+nav a { color:#ccc; text-decoration:none; margin-left:1rem; font-weight:500; transition:0.3s; }
+nav a:hover { color:#00e5ff; }
+
+.container { max-width:900px; margin:2rem auto; padding:0 1rem; }
+.tabs { display:flex; justify-content:center; gap:1rem; margin-bottom:1rem; }
+.tab-btn { padding:0.5rem 1rem; border:none; border-radius:8px; cursor:pointer; background:rgba(0,229,255,0.1); color:#7FDBFF; font-weight:bold; }
+.tab-btn.active { background:#00e5ff; color:#000; }
+
+.card { background: rgba(0,229,255,0.05); border-radius:15px; padding:1rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 6px 18px rgba(0,229,255,0.15); }
+.btn { border:none; padding:0.4rem 0.8rem; border-radius:8px; cursor:pointer; margin-left:0.5rem; }
+.btn-accept { background:#00ff99; color:#000; }
+.btn-reject { background:#ff5252; color:#fff; }
+
+footer { text-align:center; padding:1rem; color:#7FDBFF; text-shadow:0 0 5px #00e5ff; }
 </style>
 </head>
 <body>
+
 <header>
   <h1>Invites</h1>
   <nav>
@@ -31,6 +36,7 @@ nav a:hover{color:#00e5ff;}
     <a href="#" id="logoutBtn">Logout</a>
   </nav>
 </header>
+
 <div class="container">
   <div class="tabs">
     <button class="tab-btn active" id="pendingTab">Pending</button>
@@ -39,11 +45,14 @@ nav a:hover{color:#00e5ff;}
   <div id="inviteContainer"></div>
 </div>
 
+<footer>© 2025 Team Up</footer>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+// Firebase config
 const firebaseConfig = { 
   apiKey:"AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg", 
   authDomain:"teamup-8a9f0.firebaseapp.com", 
@@ -58,33 +67,33 @@ const pendingTab = document.getElementById("pendingTab");
 const sentTab = document.getElementById("sentTab");
 let currentUser = null;
 
+// Auth
 onAuthStateChanged(auth, async user=>{
   if(!user) return window.location.href="login.html";
   currentUser = user;
   loadPendingInvites();
 });
 
+// Helpers
 function clearContainer(){ container.innerHTML=""; }
 
-async function getGroupName(groupId){
-  const snap = await getDoc(doc(db,'groups',groupId));
-  return snap.exists() ? snap.data().name : groupId;
-}
-
-// Load Pending Invites
+// Pending Invites
 async function loadPendingInvites(){
   clearContainer();
   pendingTab.classList.add("active"); sentTab.classList.remove("active");
 
   const q = query(collection(db,"groups"), where("requests","array-contains",currentUser.uid));
   const snap = await getDocs(q);
-  if(snap.empty){ container.innerHTML="<p style='text-align:center;color:#ccc;'>No pending invites.</p>"; return; }
+  if(snap.empty){ container.innerHTML="<p style='text-align:center;color:#7FDBFF;'>No pending invites.</p>"; return; }
 
   for(const g of snap.docs){
     const group = g.data();
+    const creatorSnap = await getDoc(doc(db,'users',group.creatorId));
+    const creatorName = creatorSnap.exists() ? creatorSnap.data().name || creatorSnap.data().username || group.creatorId : group.creatorId;
+
     const card = document.createElement("div"); card.className="card";
     card.innerHTML=`
-      <div><strong>${group.name}</strong></div>
+      <div><strong>${group.name}</strong> <span style="font-size:0.85rem;color:#00e5ff;">from ${creatorName}</span></div>
       <div>
         <button class="btn btn-accept" onclick="acceptInvite('${g.id}')">Accept</button>
         <button class="btn btn-reject" onclick="rejectInvite('${g.id}')">Reject</button>
@@ -93,27 +102,37 @@ async function loadPendingInvites(){
   }
 }
 
-// Load Sent Invites
+// Sent Invites
 async function loadSentInvites(){
   clearContainer();
   pendingTab.classList.remove("active"); sentTab.classList.add("active");
 
   const q = query(collection(db,"groups"));
   const snap = await getDocs(q);
+  let hasInvites = false;
+
   for(const g of snap.docs){
     const group = g.data();
     if(group.creatorId===currentUser.uid && group.requests?.length){
       for(const uid of group.requests){
-        const card = document.createElement("div"); card.className="card";
-        card.innerHTML=`<div><strong>${group.name}</strong></div><div>Pending request to UID: ${uid}</div>`;
+        const userSnap = await getDoc(doc(db,'users',uid));
+        const userName = userSnap.exists() ? userSnap.data().name || userSnap.data().username || uid : uid;
+        const card = document.createElement("div"); 
+        card.className="card";
+        card.innerHTML=`
+          <div><strong>${group.name}</strong></div>
+          <div>Invite sent to: <b>${userName}</b></div>
+        `;
         container.appendChild(card);
+        hasInvites = true;
       }
     }
   }
-  if(container.innerHTML==="") container.innerHTML="<p style='text-align:center;color:#ccc;'>No sent invites.</p>";
+
+  if(!hasInvites) container.innerHTML="<p style='text-align:center;color:#7FDBFF;'>No sent invites.</p>";
 }
 
-// Accept Invite
+// Accept/Reject
 window.acceptInvite = async (groupId) => {
   const groupRef = doc(db,"groups",groupId);
   await updateDoc(groupRef,{
@@ -124,7 +143,6 @@ window.acceptInvite = async (groupId) => {
   loadPendingInvites();
 };
 
-// Reject Invite
 window.rejectInvite = async (groupId) => {
   const groupRef = doc(db,"groups",groupId);
   await updateDoc(groupRef,{
@@ -134,9 +152,11 @@ window.rejectInvite = async (groupId) => {
   loadPendingInvites();
 };
 
+// Tabs
 pendingTab.addEventListener("click", loadPendingInvites);
 sentTab.addEventListener("click", loadSentInvites);
 
+// Logout
 document.getElementById("logoutBtn").addEventListener("click", async e=>{
   e.preventDefault();
   await signOut(auth);
