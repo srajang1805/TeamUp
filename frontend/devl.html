@@ -127,6 +127,11 @@
   .tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:6px; }
   .tag { background:#00e5ff; color:#000; padding:0.2rem 0.5rem; border-radius:5px; font-size:0.8rem; }
 
+  .members { margin-top: 1rem; }
+  .member { padding: 6px 0; border-bottom: 1px solid rgba(0,229,255,0.2); }
+  .member:last-child { border-bottom: none; }
+  .member b { color:#00e5ff; }
+
   input, textarea { width: 100%; margin-top: 6px; padding: 8px; border-radius: 8px; border: 1px solid #00e5ff; background: rgba(0,229,255,0.1); color:#7FDBFF; }
 
   footer {
@@ -160,7 +165,7 @@
 </header>
 
 <section class="hero">
-  <h2>Available Dev Teams 🚀</h2>
+  <h2>Join Dev Teams 🚀</h2>
   <p>Join diverse teams based on your skills.</p>
 </section>
 
@@ -243,7 +248,6 @@ submitBtn.addEventListener('click', async ()=>{
   const size = parseInt(document.getElementById('teamSize').value);
   if(!name || !desc || !size) {statusMsg.textContent="Fill all fields"; return;}
 
-  // get creator tags
   const userSnap = await getDoc(doc(db,'users',currentUser.uid));
   const userTags = userSnap.exists() ? userSnap.data().dev || [] : [];
   const tags = [...new Set([...userTags,'dev'])];
@@ -266,7 +270,7 @@ submitBtn.addEventListener('click', async ()=>{
   }
 });
 
-// LOAD TEAMS
+// LOAD TEAMS + MEMBERS
 async function loadTeams(){
   teamContainer.innerHTML='';
   const snap = await getDocs(collection(db,'groups'));
@@ -274,7 +278,7 @@ async function loadTeams(){
   groups = groups.filter(g=>g.tags.includes('dev'));
   groups.sort((a,b)=> new Set(b.tags).size - new Set(a.tags).size);
 
-  groups.forEach(g=>{
+  for (const g of groups){
     const card = document.createElement('div');
     card.className='card';
     let btnHtml='';
@@ -283,15 +287,31 @@ async function loadTeams(){
     } else {
       btnHtml=`<button class="btn" onclick="joinTeam('${g.id}')">Request to Join</button>`;
     }
+
+    // fetch members
+    let membersHtml='';
+    if(Array.isArray(g.members) && g.members.length>0){
+      const usersSnap = await getDocs(collection(db,'users'));
+      const users = {};
+      usersSnap.forEach(u=>users[u.id]=u.data());
+      membersHtml = g.members.map(m=>{
+        const u = users[m];
+        if(!u) return `<div class="member">Unknown User</div>`;
+        const skills = (u.dev||[]).join(', ') || 'No skills';
+        return `<div class="member"><b>${u.name||'Unnamed'}</b> - ${skills}</div>`;
+      }).join('');
+    }
+
     card.innerHTML=`
       <h3>${g.name}</h3>
       <p>${g.description}</p>
       <p><b>Needed:</b> ${g.size || 'N/A'}</p>
       <div class="tags">${g.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      <div class="members"><h4>Members:</h4>${membersHtml||'<p>No members yet</p>'}</div>
       ${btnHtml}
     `;
     teamContainer.appendChild(card);
-  });
+  }
 }
 
 // JOIN TEAM
@@ -320,4 +340,3 @@ searchBar.addEventListener('input',()=>{
 </script>
 </body>
 </html>
-
