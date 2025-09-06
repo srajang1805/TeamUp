@@ -1,198 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Invites - Team Up</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(circle at top left, #0d0d0d, #1a1a1a, #0d0d0d);
-      color: #fff;
-      overflow-x: hidden;
-    }
-    .particles {
-      position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 0;
-    }
-    .particle {
-      position: absolute; border-radius: 50%; background: rgba(255, 102, 204, 0.6); animation: float 12s infinite linear;
-    }
-    @keyframes float { from { transform: translateY(100vh) scale(0.5); opacity: 0; } to { transform: translateY(-10vh) scale(1.2); opacity: 1; } }
-    header {
-      background: rgba(20,20,30,0.95); backdrop-filter: blur(6px);
-      box-shadow: 0 0 15px rgba(255,102,204,0.5), 0 0 15px rgba(70,130,255,0.5);
-      padding: 1rem; display: flex; justify-content: space-between; align-items: center; z-index: 2; position: relative;
-    }
-    header h1 { margin: 0; font-size: 1.5rem; background: linear-gradient(90deg, #ff66cc, #66a3ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    nav { display: flex; gap: 0.6rem; }
-    nav a { color: #ccc; text-decoration: none; padding: 0.35rem 0.6rem; border-radius: 6px; transition: background 0.2s, color 0.2s; }
-    nav a:hover { background: linear-gradient(90deg, #ff66cc, #66a3ff); color: #000; }
-    .container { max-width: 900px; margin: 2rem auto; padding: 1rem; position: relative; z-index: 2; }
-    h2 { color: #ff66cc; margin-bottom: 1rem; text-align: center; background: linear-gradient(90deg, #ff66cc, #66a3ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .tabs { display: flex; justify-content: center; margin-bottom: 1.5rem; gap: 1rem; }
-    .tab-btn { padding: 0.5rem 1rem; border-radius: 8px; border: none; cursor: pointer; background: rgba(255,255,255,0.05); color: #ccc; font-weight: bold; transition: all 0.3s; box-shadow: 0 0 8px rgba(255,102,204,0.3), 0 0 6px rgba(70,130,255,0.3); }
-    .tab-btn.active { background: linear-gradient(90deg, #ff66cc, #66a3ff); color: #000; box-shadow: 0 0 15px rgba(255,102,204,0.6), 0 0 15px rgba(70,130,255,0.6); }
-    .tab-btn:hover { transform: translateY(-2px); }
-    .card { background: rgba(20,20,30,0.95); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 0 15px rgba(255,102,204,0.3), 0 0 10px rgba(70,130,255,0.3); display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    .card:hover { transform: translateY(-6px); box-shadow: 0 0 25px rgba(255,102,204,0.7), 0 0 25px rgba(70,130,255,0.7); }
-    .btn { border: none; padding: 0.6rem 1rem; border-radius: 12px; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-left: 0.5rem; transition: all 0.25s; box-shadow: 0 0 8px rgba(0,0,0,0.3); }
-    .btn-accept { background: linear-gradient(90deg, #00ff99, #00c853); color: #000; box-shadow: 0 0 10px #00ff99, 0 0 6px #00c853; }
-    .btn-accept:hover { transform: translateY(-2px); box-shadow: 0 0 18px #00ff99, 0 0 12px #00c853; }
-    .btn-reject { background: linear-gradient(90deg, #ff5252, #e53935); color: #fff; box-shadow: 0 0 10px #ff5252, 0 0 6px #e53935; }
-    .btn-reject:hover { transform: translateY(-2px); box-shadow: 0 0 18px #ff5252, 0 0 12px #e53935; }
-    footer { text-align: center; padding: 1rem; font-size: 0.85rem; color: #aaa; z-index: 2; position: relative; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Invites - Team Up</title>
+<style>
+body { margin:0; font-family:"Segoe UI",sans-serif; background:#0d0d0d; color:#fff; overflow-x:hidden; }
+header{background:rgba(20,20,30,0.95); padding:1rem; display:flex; justify-content:space-between;}
+header h1{margin:0;background:linear-gradient(90deg,#ff66cc,#66a3ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+nav a{color:#ccc;text-decoration:none;margin-left:1rem;}
+nav a:hover{color:#00e5ff;}
+.container{max-width:900px;margin:2rem auto;padding:1rem;}
+.tabs{display:flex;justify-content:center;gap:1rem;margin-bottom:1rem;}
+.tab-btn{padding:0.5rem 1rem;border:none;border-radius:8px;cursor:pointer;background:rgba(255,255,255,0.05);color:#ccc;font-weight:bold;}
+.tab-btn.active{background:#00e5ff;color:#000;}
+.card{background:rgba(20,20,30,0.95);border-radius:12px;padding:1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.btn{border:none;padding:0.5rem 1rem;border-radius:10px;cursor:pointer;margin-left:0.5rem;}
+.btn-accept{background:#00ff99;color:#000;}
+.btn-reject{background:#ff5252;color:#fff;}
+</style>
 </head>
 <body>
-  <div class="particles"></div>
-
-  <header>
-    <h1>Invites</h1>
-    <nav>
-      <a href="dashboard.html">Home</a>
-      <a href="team.html">Teams</a>
-      <a href="chat.html">Chats</a>
-      <a href="invite.html">Invites</a>
-      <a href="profile.html">Profile</a>
-      <a href="#" id="logoutBtn">Logout</a>
-    </nav>
-  </header>
-
-  <div class="container">
-    <div class="tabs">
-      <button class="tab-btn active" id="pendingTab">Pending Invites</button>
-      <button class="tab-btn" id="sentTab">Sent Invites</button>
-    </div>
-
-    <div id="inviteContainer"></div>
+<header>
+  <h1>Invites</h1>
+  <nav>
+    <a href="dashboard.html">Home</a>
+    <a href="team.html">Teams</a>
+    <a href="chat.html">Chats</a>
+    <a href="invite.html">Invites</a>
+    <a href="#" id="logoutBtn">Logout</a>
+  </nav>
+</header>
+<div class="container">
+  <div class="tabs">
+    <button class="tab-btn active" id="pendingTab">Pending</button>
+    <button class="tab-btn" id="sentTab">Sent</button>
   </div>
+  <div id="inviteContainer"></div>
+</div>
 
-  <footer>© 2025 Team Up</footer>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  <script>
-    const particlesContainer = document.querySelector('.particles');
-    for (let i = 0; i < 40; i++) {
-      const particle = document.createElement('div');
-      particle.classList.add('particle');
-      particle.style.left = Math.random() * 100 + "vw";
-      particle.style.animationDuration = (6 + Math.random() * 6) + "s";
-      const size = 3 + Math.random() * 5;
-      particle.style.width = size + "px";
-      particle.style.height = size + "px";
-      particlesContainer.appendChild(particle);
-    }
-  </script>
+const firebaseConfig = { 
+  apiKey:"AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg", 
+  authDomain:"teamup-8a9f0.firebaseapp.com", 
+  projectId:"teamup-8a9f0" 
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+const container = document.getElementById("inviteContainer");
+const pendingTab = document.getElementById("pendingTab");
+const sentTab = document.getElementById("sentTab");
+let currentUser = null;
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
-      authDomain: "teamup-8a9f0.firebaseapp.com",
-      projectId: "teamup-8a9f0"
-    };
+onAuthStateChanged(auth, async user=>{
+  if(!user) return window.location.href="login.html";
+  currentUser = user;
+  loadPendingInvites();
+});
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+function clearContainer(){ container.innerHTML=""; }
 
-    const container = document.getElementById("inviteContainer");
-    const pendingTab = document.getElementById("pendingTab");
-    const sentTab = document.getElementById("sentTab");
-    let currentUser = null;
+async function getGroupName(groupId){
+  const snap = await getDoc(doc(db,'groups',groupId));
+  return snap.exists() ? snap.data().name : groupId;
+}
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return window.location.href = "login.html";
-      currentUser = user;
-      loadPendingInvites();
-    });
+// Load Pending Invites
+async function loadPendingInvites(){
+  clearContainer();
+  pendingTab.classList.add("active"); sentTab.classList.remove("active");
 
-    function clearContainer() { container.innerHTML = ""; }
+  const q = query(collection(db,"groups"), where("requests","array-contains",currentUser.uid));
+  const snap = await getDocs(q);
+  if(snap.empty){ container.innerHTML="<p style='text-align:center;color:#ccc;'>No pending invites.</p>"; return; }
 
-    async function getGroupName(groupId) {
-      const groupSnap = await getDoc(doc(db, "groups", groupId));
-      return groupSnap.exists() ? groupSnap.data().name : groupId;
-    }
+  for(const g of snap.docs){
+    const group = g.data();
+    const card = document.createElement("div"); card.className="card";
+    card.innerHTML=`
+      <div><strong>${group.name}</strong></div>
+      <div>
+        <button class="btn btn-accept" onclick="acceptInvite('${g.id}')">Accept</button>
+        <button class="btn btn-reject" onclick="rejectInvite('${g.id}')">Reject</button>
+      </div>`;
+    container.appendChild(card);
+  }
+}
 
-    async function loadPendingInvites() {
-      clearContainer();
-      pendingTab.classList.add("active");
-      sentTab.classList.remove("active");
+// Load Sent Invites
+async function loadSentInvites(){
+  clearContainer();
+  pendingTab.classList.remove("active"); sentTab.classList.add("active");
 
-      const q = query(collection(db, "groupInvites"), 
-        where("userId", "==", currentUser.uid), 
-        where("status", "==", "pending"));
-      const snap = await getDocs(q);
-      if(snap.empty) return container.innerHTML="<p style='text-align:center;color:#ccc;'>No pending invites.</p>";
-
-      for (const inviteDoc of snap.docs) {
-        const invite = inviteDoc.data();
-        const groupName = await getGroupName(invite.groupId);
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div>
-            <strong>Group:</strong> ${groupName}<br>
-            <small>Invited on: ${invite.timestamp?.toDate().toLocaleString() || "N/A"}</small>
-          </div>
-          <div>
-            <button class="btn btn-accept" onclick="acceptInvite('${inviteDoc.id}')">Accept</button>
-            <button class="btn btn-reject" onclick="rejectInvite('${inviteDoc.id}')">Reject</button>
-          </div>
-        `;
+  const q = query(collection(db,"groups"));
+  const snap = await getDocs(q);
+  for(const g of snap.docs){
+    const group = g.data();
+    if(group.creatorId===currentUser.uid && group.requests?.length){
+      for(const uid of group.requests){
+        const card = document.createElement("div"); card.className="card";
+        card.innerHTML=`<div><strong>${group.name}</strong></div><div>Pending request to UID: ${uid}</div>`;
         container.appendChild(card);
       }
     }
+  }
+  if(container.innerHTML==="") container.innerHTML="<p style='text-align:center;color:#ccc;'>No sent invites.</p>";
+}
 
-    async function loadSentInvites() {
-      clearContainer();
-      pendingTab.classList.remove("active");
-      sentTab.classList.add("active");
+// Accept Invite
+window.acceptInvite = async (groupId) => {
+  const groupRef = doc(db,"groups",groupId);
+  await updateDoc(groupRef,{
+    members: arrayUnion(currentUser.uid),
+    requests: arrayRemove(currentUser.uid)
+  });
+  alert("Invite accepted! You are now a member.");
+  loadPendingInvites();
+};
 
-      const q = query(collection(db, "groupInvites"), 
-        where("senderId", "==", currentUser.uid));
-      const snap = await getDocs(q);
-      if(snap.empty) return container.innerHTML="<p style='text-align:center;color:#ccc;'>No sent invites.</p>";
+// Reject Invite
+window.rejectInvite = async (groupId) => {
+  const groupRef = doc(db,"groups",groupId);
+  await updateDoc(groupRef,{
+    requests: arrayRemove(currentUser.uid)
+  });
+  alert("Invite rejected.");
+  loadPendingInvites();
+};
 
-      for (const inviteDoc of snap.docs) {
-        const invite = inviteDoc.data();
-        const groupName = await getGroupName(invite.groupId);
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div>
-            <strong>Group:</strong> ${groupName}<br>
-            <small>Sent to: ${invite.userId}</small><br>
-            <small>Status: ${invite.status}</small>
-          </div>
-        `;
-        container.appendChild(card);
-      }
-    }
+pendingTab.addEventListener("click", loadPendingInvites);
+sentTab.addEventListener("click", loadSentInvites);
 
-    window.acceptInvite = async (id) => {
-      await updateDoc(doc(db, "groupInvites", id), { status: "accepted" });
-      alert("Invite accepted!");
-      loadPendingInvites();
-    };
-
-    window.rejectInvite = async (id) => {
-      await updateDoc(doc(db, "groupInvites", id), { status: "rejected" });
-      alert("Invite rejected!");
-      loadPendingInvites();
-    };
-
-    pendingTab.addEventListener("click", loadPendingInvites);
-    sentTab.addEventListener("click", loadSentInvites);
-
-    document.getElementById("logoutBtn").addEventListener("click", async (e) => {
-      e.preventDefault();
-      await signOut(auth);
-      window.location.href = "login.html";
-    });
-  </script>
+document.getElementById("logoutBtn").addEventListener("click", async e=>{
+  e.preventDefault();
+  await signOut(auth);
+  window.location.href="login.html";
+});
+</script>
 </body>
 </html>
