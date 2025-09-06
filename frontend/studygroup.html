@@ -24,10 +24,7 @@
     color: var(--text-light);
     transition: background 0.4s, color 0.4s;
   }
-  body.dark {
-    background: var(--bg-gradient-dark);
-    color: var(--text-dark);
-  }
+  body.dark { background: var(--bg-gradient-dark); color: var(--text-dark); }
   header {
     background: var(--header-bg-light);
     backdrop-filter: blur(8px);
@@ -48,19 +45,8 @@
     -webkit-text-fill-color: transparent;
     margin: 0;
   }
-  nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    gap: 1rem;
-  }
-  nav a {
-    text-decoration: none;
-    color: inherit;
-    font-weight: 500;
-    transition: 0.3s;
-  }
+  nav { display: flex; align-items: center; flex: 1; gap: 1rem; }
+  nav a { text-decoration: none; color: inherit; font-weight: 500; transition: 0.3s; }
   nav a:hover { color: #6fa8ff; }
   .search-bar {
     padding: 8px 14px;
@@ -74,10 +60,7 @@
     border-image: linear-gradient(90deg, #ff8fcf, #6fa8ff) 1;
     color: #222;
   }
-  body.dark .search-bar {
-    background: #222;
-    color: #eee;
-  }
+  body.dark .search-bar { background: #222; color: #eee; }
   .search-bar:focus { box-shadow: 0px 0px 10px rgba(111,168,255,0.5); }
   .hero {
     text-align: center;
@@ -158,19 +141,8 @@
     color: #555;
     transition: background 0.4s, color 0.4s;
   }
-  body.dark footer {
-    background: var(--footer-bg-dark);
-    color: #ccc;
-  }
-  /* Theme toggle */
-  .theme-toggle {
-    cursor: pointer;
-    font-size: 1.2rem;
-    border: none;
-    background: none;
-    color: inherit;
-    transition: transform 0.3s;
-  }
+  body.dark footer { background: var(--footer-bg-dark); color: #ccc; }
+  .theme-toggle { cursor: pointer; font-size: 1.2rem; border: none; background: none; color: inherit; transition: transform 0.3s; }
   .theme-toggle:hover { transform: rotate(20deg); }
 </style>
 </head>
@@ -192,7 +164,7 @@
   <p>Join groups based on your abilities and connect with peers preparing for the same exams.</p>
 </section>
 
-<h2 class="section-title">🔥 Recommended for You</h2>
+<h2 class="section-title">🔥 Recommended Study Groups</h2>
 <section class="container" id="groupContainer">
   <!-- Create Group Card -->
   <div class="card" id="createGroupCard">
@@ -207,6 +179,7 @@
       <option value="AI">AI</option>
       <option value="Web">Web</option>
       <option value="Mobile">Mobile</option>
+      <option value="study">Study</option>
     </select>
     <button class="btn" id="submitGroup">Create Group</button>
   </div>
@@ -240,14 +213,13 @@ const themeToggle = document.getElementById("themeToggle");
 
 let currentUser = null;
 
-// Theme persistence
+// Theme
 function applyTheme(theme) {
   document.body.classList.toggle("dark", theme === "dark");
   themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
 }
 const savedTheme = localStorage.getItem("theme") || "light";
 applyTheme(savedTheme);
-
 themeToggle.addEventListener("click", () => {
   const newTheme = document.body.classList.contains("dark") ? "light" : "dark";
   applyTheme(newTheme);
@@ -281,6 +253,7 @@ submitGroupBtn.addEventListener("click", async () => {
       description: desc,
       tags,
       members: [currentUser.uid],
+      creator: currentUser.uid,
       createdAt: new Date()
     });
 
@@ -295,7 +268,7 @@ submitGroupBtn.addEventListener("click", async () => {
   }
 });
 
-// Load Groups
+// Load Groups (study only)
 async function loadGroups() {
   const cards = groupContainer.querySelectorAll(".card");
   const createCard = cards[0];
@@ -303,12 +276,16 @@ async function loadGroups() {
   if (createCard) groupContainer.appendChild(createCard);
 
   const snap = await getDocs(collection(db, "groups"));
-  const groups = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  let groups = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  // filter study-related groups
+  groups = groups.filter(g => (g.tags || []).includes("study"));
 
   const userSnap = await getDoc(doc(db, "users", currentUser.uid));
   const userData = userSnap.exists() ? userSnap.data() : {};
   const userTags = userData.study || [];
 
+  // sort by similarity
   groups.sort((a, b) => {
     const simA = (a.tags || []).filter(t => userTags.includes(t)).length;
     const simB = (b.tags || []).filter(t => userTags.includes(t)).length;
@@ -317,6 +294,13 @@ async function loadGroups() {
 
   groups.forEach(group => {
     const sim = (group.tags || []).filter(t => userTags.includes(t)).length;
+    let actionBtn = '';
+    if(group.creator === currentUser.uid) {
+      actionBtn = `<button class="btn find-btn" data-id="${group.id}">Find Teammates</button>`;
+    } else {
+      actionBtn = `<button class="btn join-btn" data-id="${group.id}">Join</button>`;
+    }
+
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
@@ -324,13 +308,16 @@ async function loadGroups() {
       <p>${group.description}</p>
       <p><b>Tags:</b> ${(group.tags || []).join(", ")}</p>
       <p><b>Similarity:</b> ${sim} shared tags</p>
-      <button class="btn join-btn" data-id="${group.id}">Join</button>
+      ${actionBtn}
     `;
     groupContainer.appendChild(card);
   });
 
   document.querySelectorAll(".join-btn").forEach(btn => {
     btn.addEventListener("click", () => joinGroup(btn.dataset.id, btn));
+  });
+  document.querySelectorAll(".find-btn").forEach(btn => {
+    btn.addEventListener("click", () => window.location.href = `searchTeammates.html?groupId=${encodeURIComponent(btn.dataset.id)}`);
   });
 }
 
