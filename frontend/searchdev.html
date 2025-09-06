@@ -6,39 +6,27 @@
 <title>Search Dev Teammates - Team Up</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Roboto:wght@400;500&display=swap');
-
 body { margin:0; font-family:'Roboto',sans-serif; background:#000; color:#7FDBFF; overflow-x:hidden; position:relative; }
 canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
-
 header { background: rgba(0,0,0,0.85); padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 20px rgba(0,229,255,0.2); position:relative; z-index:2; }
 header h1 { font-family:'Orbitron',sans-serif; font-size:1.6rem; color:#00e5ff; text-shadow:0 0 12px #00e5ff; margin:0; }
 nav { display:flex; gap:1rem; }
 nav a { color:#00e5ff; text-decoration:none; font-weight:500; transition:0.3s; }
 nav a:hover { background:#00e5ff; color:#000; padding:0.3rem 0.6rem; border-radius:8px; }
-
 .hero { text-align:center; padding:2rem; background: rgba(0,229,255,0.05); border-bottom:1px solid rgba(0,229,255,0.2); position:relative; z-index:1; }
 .hero h2 { font-family:'Orbitron',sans-serif; font-size:2rem; margin-bottom:0.5rem; color:#00e5ff; text-shadow:0 0 12px #00e5ff; }
-
 .section-title, .suggested-title { text-align:center; margin:2rem 0 1rem; font-size:1.5rem; font-family:'Orbitron',sans-serif; color:#00e5ff; text-shadow:0 0 10px #00e5ff; position:relative; z-index:1; }
 .suggested-title { color:#00ff8c; text-shadow:0 0 15px #00ff8c; font-size:1.4rem; }
-
 .container { max-width:1100px; margin:1rem auto; padding:0 1rem; display:grid; grid-template-columns: repeat(auto-fit, minmax(320px,1fr)); gap:1.5rem; position:relative; z-index:1; }
 .card { background: rgba(0,229,255,0.05); border-radius: 15px; padding: 1.5rem; text-align:left; box-shadow:0 6px 18px rgba(0,229,255,0.15); backdrop-filter:blur(8px); transition:0.3s; position:relative; }
 .card:hover { transform:translateY(-6px); box-shadow:0 10px 28px rgba(0,229,255,0.3); }
-
 .btn { margin-top:12px; padding:10px 18px; border:none; border-radius:10px; background:#00e5ff; color:#000; font-weight:500; cursor:pointer; transition:0.3s; }
 .btn:hover { background:#00bcd4; transform:translateY(-2px); }
-
-.tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:6px; }
-.tag { background:#00e5ff; color:#000; padding:0.2rem 0.5rem; border-radius:5px; font-size:0.8rem; }
-
 #searchBar { display:block; margin:0 auto 1rem; padding:0.6rem; width:300px; border-radius:8px; border:none; background: rgba(0,229,255,0.2); color:#7FDBFF; font-size:1rem; position:relative; z-index:1; }
-
 footer { text-align:center; padding:1.5rem; margin-top:2rem; font-size:0.9rem; color:#7FDBFF; text-shadow:0 0 5px #00e5ff; background: rgba(0,0,0,0.7); position:relative; z-index:1; }
 </style>
 </head>
 <body>
-
 <canvas id="matrixCanvas"></canvas>
 
 <header>
@@ -70,14 +58,10 @@ footer { text-align:center; padding:1.5rem; margin-top:2rem; font-size:0.9rem; c
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg",
-  authDomain: "teamup-8a9f0.firebaseapp.com",
-  projectId: "teamup-8a9f0"
-};
+const firebaseConfig = { apiKey:"AIzaSyC78TbLZQWs9FdfQV9m5Crw7md_PdISaCg", authDomain:"teamup-8a9f0.firebaseapp.com", projectId:"teamup-8a9f0" };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -86,7 +70,6 @@ const suggestedContainer = document.getElementById('suggestedContainer');
 const teammatesContainer = document.getElementById('teammatesContainer');
 const requestsContainer = document.getElementById('requestsContainer');
 const searchBar = document.getElementById('searchBar');
-
 let currentUser = null;
 
 // MATRIX BACKGROUND
@@ -99,10 +82,8 @@ const fontSize=16;
 const columns=Math.floor(canvas.width/fontSize);
 const drops=Array(columns).fill(1);
 function drawMatrix(){
-  ctx.fillStyle="rgba(0,0,0,0.05)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="#00e5ff";
-  ctx.font=fontSize+"px monospace";
+  ctx.fillStyle="rgba(0,0,0,0.05)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#00e5ff"; ctx.font=fontSize+"px monospace";
   for(let i=0;i<drops.length;i++){
     const text=letters[Math.floor(Math.random()*letters.length)];
     ctx.fillText(text,i*fontSize,drops[i]*fontSize);
@@ -117,21 +98,18 @@ const urlParams = new URLSearchParams(window.location.search);
 const groupId = urlParams.get('groupId');
 if(!groupId){ alert("No team selected!"); window.location.href="dev.html"; }
 
-// AUTH
 onAuthStateChanged(auth, async user=>{
   if(!user){ window.location.href='login.html'; return; }
   currentUser=user;
   await loadTeammates();
 });
 
-// LOGOUT
 document.getElementById('logoutBtn').addEventListener('click', async ()=>{ await signOut(auth); window.location.href='login.html'; });
 
-// LOAD TEAM & TEAMMATES
 async function loadTeammates(){
-  suggestedContainer.innerHTML='<p style="color:#7FDBFF">Loading suggested teammates...</p>';
-  teammatesContainer.innerHTML='<p style="color:#7FDBFF">Loading other teammates...</p>';
-  requestsContainer.innerHTML='<p style="color:#7FDBFF">Loading requests...</p>';
+  suggestedContainer.innerHTML='Loading...';
+  teammatesContainer.innerHTML='Loading...';
+  requestsContainer.innerHTML='Loading...';
 
   const groupRef = doc(db,'groups',groupId);
   const groupSnap = await getDoc(groupRef);
@@ -140,13 +118,7 @@ async function loadTeammates(){
 
   const usersSnap = await getDocs(collection(db,'users'));
   const allUsers=[];
-  usersSnap.forEach(u=>{
-    const data=u.data();
-    if(!group.members.includes(u.id)) allUsers.push({id:u.id,...data});
-  });
-
-  // Sort by number of skills
-  allUsers.sort((a,b)=> (b.dev?.length||0)-(a.dev?.length||0) );
+  usersSnap.forEach(u=>{ if(u.id!==currentUser.uid) allUsers.push({id:u.id,...u.data()}); });
 
   const suggested = allUsers.filter(u=> (u.dev?.length||0)>=3 );
   const others = allUsers.filter(u=> (u.dev?.length||0)<3 );
@@ -154,8 +126,7 @@ async function loadTeammates(){
   function renderUsers(container, users){
     container.innerHTML='';
     users.forEach(u=>{
-      const card=document.createElement('div');
-      card.className='card';
+      const card=document.createElement('div'); card.className='card';
       const skills = u.dev||[];
       card.innerHTML=`
         <h3>${u.name||'Unnamed'}</h3>
@@ -169,74 +140,57 @@ async function loadTeammates(){
   renderUsers(suggestedContainer, suggested);
   renderUsers(teammatesContainer, others);
 
-  // Show requests for creator
-  if(group.creatorId === currentUser.uid && group.requests?.length){
+  // Incoming requests for creator
+  if(group.creatorId===currentUser.uid){
     requestsContainer.innerHTML='';
-    for(const uid of group.requests){
-      const userDoc = await getDoc(doc(db,'users',uid));
-      if(userDoc.exists()){
-        const user = userDoc.data();
-        const card=document.createElement('div');
-        card.className='card';
-        card.innerHTML=`
-          <h3>${user.name||'Unnamed'}</h3>
-          <p><b>Skills:</b> ${(user.dev||[]).join(', ')||'None'}</p>
-          <button class="btn" onclick="approveRequest('${uid}')">✅ Approve</button>
-          <button class="btn" onclick="declineRequest('${uid}')">❌ Decline</button>
-        `;
-        requestsContainer.appendChild(card);
+    if(group.requests?.length){
+      for(const uid of group.requests){
+        const userDoc = await getDoc(doc(db,'users',uid));
+        if(userDoc.exists()){
+          const user = userDoc.data();
+          const card = document.createElement('div'); card.className='card';
+          card.innerHTML=`
+            <h3>${user.name||'Unnamed'}</h3>
+            <p><b>Skills:</b> ${(user.dev||[]).join(', ')||'None'}</p>
+            <button class="btn" onclick="approveRequest('${uid}')">✅ Approve</button>
+            <button class="btn" onclick="declineRequest('${uid}')">❌ Decline</button>
+          `;
+          requestsContainer.appendChild(card);
+        }
       }
-    }
-  } else {
-    requestsContainer.innerHTML='<p style="color:#7FDBFF;text-align:center;">No incoming requests</p>';
-  }
+    } else requestsContainer.innerHTML='No incoming requests';
+  } else requestsContainer.innerHTML='Only team creator can see requests';
 }
 
-// SEND REQUEST
+// MULTIPLE REQUESTS
 window.sendRequest = async (userId)=>{
   const groupRef = doc(db,'groups',groupId);
-  const snap = await getDoc(groupRef);
-  const data = snap.data();
-  if(!data.requests) data.requests=[];
-  if(!data.requests.includes(currentUser.uid)){
-    data.requests.push(currentUser.uid);
-    await updateDoc(groupRef,{requests:data.requests});
-    alert("Request sent to team creator!");
-    await loadTeammates();
-  } else {
-    alert("You already requested!");
-  }
+  await updateDoc(groupRef, { requests: arrayUnion(userId) });
+  alert("Request sent!");
+  loadTeammates();
 }
 
-// APPROVE / DECLINE
 window.approveRequest = async uid=>{
   const groupRef = doc(db,'groups',groupId);
+  await updateDoc(groupRef,{ members: arrayUnion(uid) });
   const snap = await getDoc(groupRef);
-  const data = snap.data();
-  if(!data.members) data.members=[];
-  if(!data.requests) data.requests=[];
-  if(!data.members.includes(uid)) data.members.push(uid);
-  data.requests = data.requests.filter(r=>r!==uid);
-  await updateDoc(groupRef,{members:data.members, requests:data.requests});
-  await loadTeammates();
+  const newRequests = snap.data().requests.filter(r=>r!==uid);
+  await updateDoc(groupRef, { requests: newRequests });
+  loadTeammates();
 }
 
 window.declineRequest = async uid=>{
   const groupRef = doc(db,'groups',groupId);
   const snap = await getDoc(groupRef);
-  const data = snap.data();
-  if(!data.requests) data.requests=[];
-  data.requests = data.requests.filter(r=>r!==uid);
-  await updateDoc(groupRef,{requests:data.requests});
-  await loadTeammates();
+  const newRequests = snap.data().requests.filter(r=>r!==uid);
+  await updateDoc(groupRef, { requests: newRequests });
+  loadTeammates();
 }
 
-// SEARCH FILTER
 searchBar.addEventListener('input',()=>{
   const q = searchBar.value.toLowerCase();
   document.querySelectorAll('#suggestedContainer .card, #teammatesContainer .card').forEach(card=>{
-    const txt = card.querySelector('h3').innerText.toLowerCase();
-    card.style.display = txt.includes(q)?'block':'none';
+    card.style.display = card.querySelector('h3').innerText.toLowerCase().includes(q)?'block':'none';
   });
 });
 </script>
